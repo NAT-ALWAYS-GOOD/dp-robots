@@ -2,7 +2,7 @@ namespace DPRobots.Pieces;
 
 public abstract class Piece(string name)
 {
-    private string Name { get; } = name;
+    private readonly string _name = name;
     
-    public override string ToString() => Name;
+    public override string ToString() => _name;
 }
