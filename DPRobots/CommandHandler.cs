@@ -11,6 +11,7 @@ public class CommandHandler
     /// ARGS peut être vide
     ///
     /// Les instructions valides sont :
+    /// HELP
     /// STOCKS
     /// NEEDED_STOCKS ARGS
     /// INSTRUCTIONS ARGS
@@ -28,6 +29,21 @@ public class CommandHandler
 
             switch (instruction.ToUpper())
             {
+                case "HELP":
+                    if (!IsArgsEmpty(args))
+                    {
+                        Logger.Log(LogType.ERROR, "La commande HELP ne prend pas d'arguments.");
+                        return;
+                    }
+
+                    Console.WriteLine("Liste des commandes disponibles :");
+                    Console.WriteLine("STOCKS : Affiche les stocks disponibles.");
+                    Console.WriteLine("NEEDED_STOCKS : Affiche les stocks requis pour construire les robots.");
+                    Console.WriteLine("INSTRUCTIONS : Affiche les instructions de construction des robots.");
+                    Console.WriteLine("VERIFY : Vérifie la commande.");
+                    Console.WriteLine("PRODUCE : Produit les robots.");
+                    break;
+                
                 case "STOCKS":
                     if (!IsArgsEmpty(args))
                     {
@@ -128,11 +144,10 @@ public class CommandHandler
     /// </summary>
     private static Dictionary<string, int>? ValidateAndParseArgs(string args, string commandName)
     {
-        if (IsArgsEmpty(args))
-        {
-            Logger.Log(LogType.ERROR, $"La commande {commandName} nécessite des arguments.");
-            return null;
-        }
-        return ParseArgs(args);
+        if (!IsArgsEmpty(args)) 
+            return ParseArgs(args);
+
+        Logger.Log(LogType.ERROR, $"La commande {commandName} nécessite des arguments.");
+        return null;
     }
 }
