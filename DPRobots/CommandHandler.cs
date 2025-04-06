@@ -1,9 +1,12 @@
 using DPRobots.Logging;
+using DPRobots.Stock;
 
 namespace DPRobots;
 
 public class CommandHandler
 {
+    private static readonly StockManager StockManager = StockManager.Instance!;
+
     /// <summary>
     /// Gère l'exécution d'une commande utilisateur
     /// Format attendu => INSTRUCTION ARGS
@@ -43,7 +46,7 @@ public class CommandHandler
                     Console.WriteLine("VERIFY : Vérifie la commande.");
                     Console.WriteLine("PRODUCE : Produit les robots.");
                     break;
-                
+
                 case "STOCKS":
                     if (!IsArgsEmpty(args))
                     {
@@ -51,7 +54,7 @@ public class CommandHandler
                         return;
                     }
 
-                    Console.WriteLine("Affichage des stocks disponibles :");
+                    DisplayStock();
                     break;
 
                 case "NEEDED_STOCKS":
@@ -144,10 +147,26 @@ public class CommandHandler
     /// </summary>
     private static Dictionary<string, int>? ValidateAndParseArgs(string args, string commandName)
     {
-        if (!IsArgsEmpty(args)) 
+        if (!IsArgsEmpty(args))
             return ParseArgs(args);
 
         Logger.Log(LogType.ERROR, $"La commande {commandName} nécessite des arguments.");
         return null;
+    }
+
+    private static void DisplayStock()
+    {
+        var pieceStock = StockManager.GetPieceStock;
+        var robotStock = StockManager.GetRobotStocks;
+
+        foreach (var piece in pieceStock)
+        {
+            Console.WriteLine($"{piece.Value.Quantity} {piece.Key}");
+        }
+        
+        foreach (var robot in robotStock)
+        {
+            Console.WriteLine($"{robot.Value.Quantity} {robot.Key}");
+        }
     }
 }

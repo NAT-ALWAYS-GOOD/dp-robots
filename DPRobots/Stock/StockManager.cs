@@ -8,6 +8,13 @@ public class StockManager(Dictionary<string, StockItem> stock)
     private readonly Dictionary<string, StockItem> _stocks = stock;
     private readonly Dictionary<string, RobotStockItem> _robotStocks = new Dictionary<string, RobotStockItem>();
 
+    public static StockManager? Instance { get; private set; }
+
+    public static void Initialize(Dictionary<string, StockItem> stock)
+    {
+        Instance = new StockManager(stock);
+    }
+
     public T RemovePiece<T>(string key) where T : Piece
     {
         var stockItem = _stocks.GetValueOrDefault(key);
@@ -27,7 +34,7 @@ public class StockManager(Dictionary<string, StockItem> stock)
         else
             _robotStocks[key] = new RobotStockItem(robot, 1);
     }
-    
+
     public IReadOnlyDictionary<string, StockItem> GetPieceStock => _stocks;
     public IReadOnlyDictionary<string, RobotStockItem> GetRobotStocks => _robotStocks;
 }
