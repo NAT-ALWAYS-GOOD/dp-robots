@@ -33,9 +33,8 @@ public class RobotBuildTests
     }
     
     [Fact]
-    public void Should_BuildRobot_When_ValidBlueprintProvided()
+    public void Should_BuildRobot_And_UpdateStock_When_ValidBlueprintProvided()
     {
-        // Arrange
         var robot = new Rd1();
         const string expectedName = "RD-1";
         var expectedCore = new Core(CoreNames.Cd1);
@@ -43,20 +42,18 @@ public class RobotBuildTests
         var expectedGripModule = new GripModule(GripModuleNames.Ad1);
         var expectedMoveModule = new MoveModule(MoveModuleNames.Ld1);
 
-        // Act
         robot.Build(StockManager, SystemToInstall);
 
-        // Assert
         Assert.Equal(expectedName, robot.ToString());
         Assert.Equal(expectedCore, robot.Core);
         Assert.Equal(expectedGenerator, robot.Generator);
         Assert.Equal(expectedGripModule, robot.GripModule);
         Assert.Equal(expectedMoveModule, robot.MoveModule);
         
-        // check the stock has been updated
         Assert.Equal(4, Stock[expectedCore.ToString()].Quantity);
         Assert.Equal(4, Stock[expectedGenerator.ToString()].Quantity);
         Assert.Equal(4, Stock[expectedGripModule.ToString()].Quantity);
         Assert.Equal(4, Stock[expectedMoveModule.ToString()].Quantity);
+        Assert.Equal(1, StockManager.GetRobotStocks[robot.ToString()].Quantity);
     }
 }
