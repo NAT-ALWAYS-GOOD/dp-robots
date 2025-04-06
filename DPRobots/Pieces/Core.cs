@@ -17,7 +17,12 @@ public class Core(CoreNames name): Piece(name.ToString())
     {
         _system = system;
     }
-    
+
+    public override object Clone()
+    {
+        return new Core(_name);
+    }
+
     public override string ToString()
     {
         return $"Core_{_name.ToString().ToUpper()}";

@@ -3,7 +3,21 @@ namespace DPRobots.Pieces;
 public class AssembledPiece : Piece
 {
     public List<Piece> Pieces { get; }
-    
+
+    public override object Clone()
+    {
+        List<Piece> clonedPieces = new List<Piece>();
+        foreach (var piece in Pieces)
+        {
+            if (piece is AssembledPiece assembledPiece)
+                clonedPieces.Add(new AssembledPiece(assembledPiece.Pieces));
+            else
+                clonedPieces.Add((Piece)piece.Clone());
+        }
+
+        return new AssembledPiece(clonedPieces);
+    }
+
     public AssembledPiece(List<Piece> pieces) : base(ComputeName(pieces))
     {
         VerifyPieces(pieces);
@@ -35,6 +49,6 @@ public class AssembledPiece : Piece
 
     private static string ComputeName(List<Piece> pieces)
     {
-        return "[" + string.Join(",", Flatten(pieces).Select(p => p.ToString())) + "]";
+        return "[" + string.Join(",", pieces.Select(p => p.ToString())) + "]";
     }
 }

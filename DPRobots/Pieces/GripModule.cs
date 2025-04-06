@@ -11,6 +11,11 @@ public class GripModule(GripModuleNames name): Piece(name.ToString())
 {
     private readonly GripModuleNames _name = name;
     
+    public override object Clone()
+    {
+        return new GripModule(_name);
+    }
+    
     public override string ToString()
     {
         return $"Arms_{_name.ToString().ToUpper()}";

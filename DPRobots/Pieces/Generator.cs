@@ -10,7 +10,12 @@ public enum GeneratorNames
 public class Generator(GeneratorNames name): Piece(name.ToString())
 {
     private readonly GeneratorNames _name = name;
-    
+
+    public override object Clone()
+    {
+        return new Generator(_name);
+    }
+
     public override string ToString()
     {
         return $"Generator_{_name.ToString().ToUpper()}";
