@@ -6,15 +6,13 @@ namespace DPRobots.Robots;
 public abstract class Robot
 {
     protected abstract string Name { get; }
-    protected abstract RobotBlueprint Blueprint { get; }
+    public abstract RobotBlueprint Blueprint { get; }
 
     public Core? Core { get; private set; }
     public Generator? Generator { get; private set; }
     public GripModule? GripModule { get; private set; }
     public MoveModule? MoveModule { get; private set; }
 
-    public RobotBlueprint GetBlueprint => Blueprint;
-    
     public void Build(StockManager stockManager, System systemToInstall)
     {
         Console.WriteLine("PRODUCING " + Name);

@@ -7,6 +7,8 @@ namespace DPRobots;
 public class CommandHandler
 {
     private static readonly StockManager StockManager = StockManager.Instance!;
+    private static readonly IReadOnlyDictionary<string, StockItem> PieceStock = StockManager.GetPieceStock;
+    private static readonly IReadOnlyDictionary<string, RobotStockItem> RobotStock = StockManager.GetRobotStocks;
 
     /// <summary>
     /// Gère l'exécution d'une commande utilisateur
@@ -29,7 +31,6 @@ public class CommandHandler
         try
         {
             var (instruction, args) = ParseCommand(commandLine);
-            Dictionary<string, int> robots;
 
             switch (instruction.ToUpper())
             {
@@ -61,24 +62,29 @@ public class CommandHandler
                 case "NEEDED_STOCKS":
                     var neededStocks = ValidateAndParseArgs(args, "NEEDED_STOCKS");
                     if (neededStocks == null) return;
+                    if (!VerifyRobots(neededStocks)) return;
                     DisplayNeededStocks(neededStocks);
                     break;
 
                 case "INSTRUCTIONS":
                     var instructionsArgs = ValidateAndParseArgs(args, "INSTRUCTIONS");
                     if (instructionsArgs == null) return;
+                    if (!VerifyRobots(instructionsArgs)) return;
                     Console.WriteLine("Affichage des instructions de construction des robots :");
                     break;
 
                 case "VERIFY":
                     var verifyArgs = ValidateAndParseArgs(args, "VERIFY");
                     if (verifyArgs == null) return;
-                    Console.WriteLine("Affichage verification de la commande :");
+                    if (!VerifyRobots(verifyArgs)) return;
+                    VerifyCommandIsAvailable(verifyArgs);
+
                     break;
 
                 case "PRODUCE":
                     var produceArgs = ValidateAndParseArgs(args, "PRODUCE");
                     if (produceArgs == null) return;
+                    if (!VerifyRobots(produceArgs)) return;
                     Console.WriteLine("Affichage produce de la commande :");
                     break;
 
@@ -157,30 +163,71 @@ public class CommandHandler
 
     private static void DisplayStock()
     {
-        var pieceStock = StockManager.GetPieceStock;
-        var robotStock = StockManager.GetRobotStocks;
-
-        foreach (var piece in pieceStock)
+        foreach (var piece in PieceStock)
             Console.WriteLine($"{piece.Value.Quantity} {piece.Key}");
 
-        foreach (var robot in robotStock)
+        foreach (var robot in RobotStock)
             Console.WriteLine($"{robot.Value.Quantity} {robot.Key}");
     }
 
+    /// <summary>
+    /// Récupère le robot correspondant au nom donné.
+    /// Si le nom ne correspond à aucun robot connu, retourne null.
+    /// </summary>
+    /// <param name="robotName"></param>
     private static Robot? GetRobotByName(string robotName)
     {
-        switch (robotName.ToUpper())
+        return robotName.ToUpper() switch
         {
-            case "XM-1": return new Xm1();
-            case "RD-1": return new Rd1();
-            case "WI-1": return new Wi1();
-            default:
-                Logger.Log(LogType.ERROR, $"'{robotName}' is not a recognized robot");
-                return null;
-        }
+            "XM-1" => new Xm1(),
+            "RD-1" => new Rd1(),
+            "WI-1" => new Wi1(),
+            _ => null
+        };
     }
 
     private static void DisplayNeededStocks(Dictionary<string, int> robotRequests)
+    {
+        var overallTotals = CalculateOverallNeededStocks(robotRequests, true);
+
+        if (overallTotals.Count == 0)
+            return;
+
+        Console.WriteLine("Total:");
+        foreach (var total in overallTotals)
+            Console.WriteLine($"{total.Value} {total.Key}");
+    }
+
+    private static void VerifyCommandIsAvailable(Dictionary<string, int> robotRequests)
+    {
+        var overallTotals = CalculateOverallNeededStocks(robotRequests);
+
+        foreach (var piece in overallTotals)
+        {
+            var available = PieceStock.TryGetValue(piece.Key, out var stockItem) ? stockItem.Quantity : 0;
+            if (available >= piece.Value)
+                continue;
+
+            Logger.Log(LogType.UNAVAILABLE);
+            return;
+        }
+
+        Logger.Log(LogType.AVAILABLE);
+    }
+
+    private static bool VerifyRobots(Dictionary<string, int> robotRequests)
+    {
+        var invalidRobot = robotRequests.Keys
+            .FirstOrDefault(robotName => GetRobotByName(robotName) == null);
+
+        if (invalidRobot == null) return true;
+
+        Logger.Log(LogType.ERROR, $"'{invalidRobot}' is not a recognized robot");
+        return false;
+    }
+
+    private static Dictionary<string, int> CalculateOverallNeededStocks(Dictionary<string, int> robotRequests,
+        bool printDetails = false)
     {
         var overallTotals = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
 
@@ -195,7 +242,7 @@ public class CommandHandler
             var robot = GetRobotByName(robotName);
             if (robot == null) continue;
 
-            var blueprint = robot.GetBlueprint;
+            var blueprint = robot.Blueprint;
 
             var pieceNames = new[]
             {
@@ -205,19 +252,21 @@ public class CommandHandler
                 blueprint.MoveModulePrototype.ToString()
             };
 
-            Console.WriteLine($"{count} {robotName} :");
+            if (printDetails)
+            {
+                Console.WriteLine($"{count} {robotName} :");
+                foreach (var pieceName in pieceNames)
+                {
+                    Console.WriteLine($"    {count} {pieceName}");
+                }
+            }
+
             foreach (var pieceName in pieceNames)
             {
-                Console.WriteLine($"    {count} {pieceName}");
                 AddToTotal(pieceName, count);
             }
         }
 
-        if (overallTotals.Count == 0)
-            return;
-
-        Console.WriteLine("Total:");
-        foreach (var total in overallTotals)
-            Console.WriteLine($"{total.Value} {total.Key}");
+        return overallTotals;
     }
 }
