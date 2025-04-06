@@ -1,4 +1,5 @@
 using DPRobots.Logging;
+using DPRobots.Robots;
 using DPRobots.Stock;
 
 namespace DPRobots;
@@ -60,7 +61,7 @@ public class CommandHandler
                 case "NEEDED_STOCKS":
                     var neededStocks = ValidateAndParseArgs(args, "NEEDED_STOCKS");
                     if (neededStocks == null) return;
-                    Console.WriteLine("Affichage des stocks requis pour construire les robots :");
+                    DisplayNeededStocks(neededStocks);
                     break;
 
                 case "INSTRUCTIONS":
@@ -160,13 +161,63 @@ public class CommandHandler
         var robotStock = StockManager.GetRobotStocks;
 
         foreach (var piece in pieceStock)
-        {
             Console.WriteLine($"{piece.Value.Quantity} {piece.Key}");
-        }
-        
+
         foreach (var robot in robotStock)
-        {
             Console.WriteLine($"{robot.Value.Quantity} {robot.Key}");
+    }
+
+    private static Robot? GetRobotByName(string robotName)
+    {
+        switch (robotName.ToUpper())
+        {
+            case "XM-1": return new Xm1();
+            case "RD-1": return new Rd1();
+            case "WI-1": return new Wi1();
+            default:
+                Logger.Log(LogType.ERROR, $"'{robotName}' is not a recognized robot");
+                return null;
         }
+    }
+
+    private static void DisplayNeededStocks(Dictionary<string, int> robotRequests)
+    {
+        var overallTotals = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+
+        void AddToTotal(string pieceName, int quantity)
+        {
+            if (!overallTotals.TryAdd(pieceName, quantity))
+                overallTotals[pieceName] += quantity;
+        }
+
+        foreach (var (robotName, count) in robotRequests)
+        {
+            var robot = GetRobotByName(robotName);
+            if (robot == null) continue;
+
+            var blueprint = robot.GetBlueprint;
+
+            var pieceNames = new[]
+            {
+                blueprint.CorePrototype.ToString(),
+                blueprint.GeneratorPrototype.ToString(),
+                blueprint.GripModulePrototype.ToString(),
+                blueprint.MoveModulePrototype.ToString()
+            };
+
+            Console.WriteLine($"{count} {robotName} :");
+            foreach (var pieceName in pieceNames)
+            {
+                Console.WriteLine($"    {count} {pieceName}");
+                AddToTotal(pieceName, count);
+            }
+        }
+
+        if (overallTotals.Count == 0)
+            return;
+
+        Console.WriteLine("Total:");
+        foreach (var total in overallTotals)
+            Console.WriteLine($"{total.Value} {total.Key}");
     }
 }

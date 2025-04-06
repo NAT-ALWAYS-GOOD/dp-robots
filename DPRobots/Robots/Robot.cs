@@ -13,6 +13,8 @@ public abstract class Robot
     public GripModule? GripModule { get; private set; }
     public MoveModule? MoveModule { get; private set; }
 
+    public RobotBlueprint GetBlueprint => Blueprint;
+    
     public void Build(StockManager stockManager, System systemToInstall)
     {
         Console.WriteLine("PRODUCING " + Name);
