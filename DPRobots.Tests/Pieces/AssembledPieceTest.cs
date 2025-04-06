@@ -48,7 +48,7 @@ public class AssembledPieceTest
         
         var secondAssembledPiece = new AssembledPiece([firstAssembledPiece, moveModule]);
         
-        Assert.Equal("[Core_CM1,Generator_GM1,Legs_LD1]", secondAssembledPiece.ToString());
+        Assert.Equal("[[Core_CM1,Generator_GM1],Legs_LD1]", secondAssembledPiece.ToString());
     }
     
     [Fact]
