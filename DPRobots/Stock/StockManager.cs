@@ -1,10 +1,12 @@
 using DPRobots.Pieces;
+using DPRobots.Robots;
 
 namespace DPRobots.Stock;
 
 public class StockManager(Dictionary<string, StockItem> stock)
 {
     private readonly Dictionary<string, StockItem> _stocks = stock;
+    private readonly Dictionary<string, RobotStockItem> _robotStocks = new Dictionary<string, RobotStockItem>();
 
     public T RemovePiece<T>(string key) where T : Piece
     {
@@ -16,4 +18,16 @@ public class StockManager(Dictionary<string, StockItem> stock)
 
         return (T)stockItem.Prototype.Clone();
     }
+
+    public void AddRobot(Robot robot)
+    {
+        var key = robot.ToString();
+        if (_robotStocks.TryGetValue(key, out var robotStockItem))
+            robotStockItem.IncreaseQuantity(1);
+        else
+            _robotStocks[key] = new RobotStockItem(robot, 1);
+    }
+    
+    public IReadOnlyDictionary<string, StockItem> GetPieceStock => _stocks;
+    public IReadOnlyDictionary<string, RobotStockItem> GetRobotStocks => _robotStocks;
 }

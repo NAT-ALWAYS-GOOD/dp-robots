@@ -1,4 +1,5 @@
 using DPRobots.Pieces;
+using DPRobots.Robots;
 using DPRobots.Stock;
 using Xunit;
 
@@ -43,5 +44,30 @@ public class StockManagerTests
         var stockManager = new StockManager(new Dictionary<string, StockItem>());
         var exception = Assert.Throws<InvalidOperationException>(() => stockManager.RemovePiece<Piece>("NonExistentKey"));
         Assert.Equal("No stock item found for key: NonExistentKey", exception.Message);
+    }
+    
+    [Fact]
+    public void Should_AddRobot_When_RobotIsAdded()
+    {
+        var robot = new Rd1();
+        var stockManager = new StockManager(new Dictionary<string, StockItem>());
+        
+        stockManager.AddRobot(robot);
+        
+        Assert.True(stockManager.GetRobotStocks.ContainsKey(robot.ToString()));
+        Assert.Equal(1, stockManager.GetRobotStocks[robot.ToString()].Quantity);
+    }
+    
+    [Fact]
+    public void Should_IncreaseRobotQuantity_When_RobotAlreadyExists()
+    {
+        var robot = new Rd1();
+        var stockManager = new StockManager(new Dictionary<string, StockItem>());
+        
+        stockManager.AddRobot(robot);
+        stockManager.AddRobot(robot);
+        
+        Assert.True(stockManager.GetRobotStocks.ContainsKey(robot.ToString()));
+        Assert.Equal(2, stockManager.GetRobotStocks[robot.ToString()].Quantity);
     }
 }
