@@ -10,6 +10,8 @@ public class CommandHandler
     private static readonly IReadOnlyDictionary<string, StockItem> PieceStock = StockManager.GetPieceStock;
     private static readonly IReadOnlyDictionary<string, RobotStockItem> RobotStock = StockManager.GetRobotStocks;
 
+    private static readonly System SystemToInstall = new (SystemNames.Sb1);
+
     /// <summary>
     /// Gère l'exécution d'une commande utilisateur
     /// Format attendu => INSTRUCTION ARGS
@@ -70,14 +72,28 @@ public class CommandHandler
                     var instructionsArgs = ValidateAndParseArgs(args, "INSTRUCTIONS");
                     if (instructionsArgs == null) return;
                     if (!VerifyRobots(instructionsArgs)) return;
-                    Console.WriteLine("Affichage des instructions de construction des robots :");
+
+                    foreach (var (robotName, count) in instructionsArgs)
+                    {
+                        var robotToBuild = GetRobotByName(robotName);
+                        if (robotToBuild == null) continue;
+
+                        for (var i = 0; i < count; i++)
+                        {
+                            robotToBuild.Build(StockManager, SystemToInstall, true);
+                        }
+                    }
+
                     break;
 
                 case "VERIFY":
                     var verifyArgs = ValidateAndParseArgs(args, "VERIFY");
                     if (verifyArgs == null) return;
                     if (!VerifyRobots(verifyArgs)) return;
-                    VerifyCommandIsAvailable(verifyArgs);
+                    if (VerifyCommandIsAvailable(verifyArgs))
+                        Logger.Log(LogType.AVAILABLE);
+                    else
+                        Logger.Log(LogType.UNAVAILABLE);
 
                     break;
 
@@ -85,7 +101,24 @@ public class CommandHandler
                     var produceArgs = ValidateAndParseArgs(args, "PRODUCE");
                     if (produceArgs == null) return;
                     if (!VerifyRobots(produceArgs)) return;
-                    Console.WriteLine("Affichage produce de la commande :");
+
+                    if (!VerifyCommandIsAvailable(produceArgs))
+                    {
+                        Logger.Log(LogType.ERROR, "Impossible de produire les robots, pas assez de pièces.");
+                        return;
+                    }
+
+                    foreach (var (robotName, count) in produceArgs)
+                    {
+                        var robotToBuild = GetRobotByName(robotName);
+                        if (robotToBuild == null) continue;
+
+                        for (var i = 0; i < count; i++)
+                        {
+                            robotToBuild.Build(StockManager, SystemToInstall);
+                        }
+                    }
+
                     break;
 
                 default:
@@ -163,11 +196,11 @@ public class CommandHandler
 
     private static void DisplayStock()
     {
-        foreach (var piece in PieceStock)
-            Console.WriteLine($"{piece.Value.Quantity} {piece.Key}");
-
         foreach (var robot in RobotStock)
             Console.WriteLine($"{robot.Value.Quantity} {robot.Key}");
+        
+        foreach (var piece in PieceStock)
+            Console.WriteLine($"{piece.Value.Quantity} {piece.Key}");
     }
 
     /// <summary>
@@ -198,7 +231,7 @@ public class CommandHandler
             Console.WriteLine($"{total.Value} {total.Key}");
     }
 
-    private static void VerifyCommandIsAvailable(Dictionary<string, int> robotRequests)
+    private static bool VerifyCommandIsAvailable(Dictionary<string, int> robotRequests)
     {
         var overallTotals = CalculateOverallNeededStocks(robotRequests);
 
@@ -208,11 +241,10 @@ public class CommandHandler
             if (available >= piece.Value)
                 continue;
 
-            Logger.Log(LogType.UNAVAILABLE);
-            return;
+            return false;
         }
 
-        Logger.Log(LogType.AVAILABLE);
+        return true;
     }
 
     private static bool VerifyRobots(Dictionary<string, int> robotRequests)
@@ -242,15 +274,7 @@ public class CommandHandler
             var robot = GetRobotByName(robotName);
             if (robot == null) continue;
 
-            var blueprint = robot.Blueprint;
-
-            var pieceNames = new[]
-            {
-                blueprint.CorePrototype.ToString(),
-                blueprint.GeneratorPrototype.ToString(),
-                blueprint.GripModulePrototype.ToString(),
-                blueprint.MoveModulePrototype.ToString()
-            };
+            var pieceNames = GetNeededPieceNames(robot);
 
             if (printDetails)
             {
@@ -268,5 +292,17 @@ public class CommandHandler
         }
 
         return overallTotals;
+
+        IEnumerable<string> GetNeededPieceNames(Robot robot)
+        {
+            var blueprint = robot.Blueprint;
+            return
+            [
+                blueprint.CorePrototype.ToString(),
+                blueprint.GeneratorPrototype.ToString(),
+                blueprint.GripModulePrototype.ToString(),
+                blueprint.MoveModulePrototype.ToString()
+            ];
+        }
     }
 }
