@@ -63,7 +63,6 @@ public abstract class Robot
         Console.WriteLine("ASSEMBLE " + assemblyTmp3 + " " + assemblyTmp2 + " " + neededMoveModule);
 
         Console.WriteLine("FINISHED " + Name);
-        if (!simulate) stockManager.AddRobot(this);
     }
 
     public override string ToString() => Name;

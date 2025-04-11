@@ -116,6 +116,7 @@ public class CommandHandler
                         for (var i = 0; i < count; i++)
                         {
                             robotToBuild.Build(StockManager, SystemToInstall);
+                            StockManager.AddRobot(robotToBuild);
                         }
                     }
 
