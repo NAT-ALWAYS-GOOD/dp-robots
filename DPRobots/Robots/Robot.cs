@@ -13,54 +13,34 @@ public abstract class Robot
     public GripModule? GripModule { get; private set; }
     public MoveModule? MoveModule { get; private set; }
 
-    public void Build(StockManager stockManager, System systemToInstall, bool simulate = false)
+    public void Build(RobotComponents robotComponents, System systemToInstall, bool simulate = false)
     {
         Console.WriteLine("PRODUCING " + Name);
+        
+        Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.Core);
+        Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.Generator);
+        Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.GripModule);
+        Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.MoveModule);
 
-        Core neededCore;
-        Generator neededGenerator;
-        GripModule neededGripModule;
-        MoveModule neededMoveModule;
+        if (!simulate) robotComponents.Core.InstallSystem(systemToInstall);
+        Console.WriteLine("INSTALL " + systemToInstall + " " + robotComponents.Core);
 
-        if (simulate)
-        {
-            neededCore = Blueprint.CorePrototype;
-            neededGenerator = Blueprint.GeneratorPrototype;
-            neededGripModule = Blueprint.GripModulePrototype;
-            neededMoveModule = Blueprint.MoveModulePrototype;
-        }
-        else
-        {
-            neededCore = stockManager.RemovePiece<Core>(Blueprint.CorePrototype.ToString());
-            neededGenerator = stockManager.RemovePiece<Generator>(Blueprint.GeneratorPrototype.ToString());
-            neededGripModule = stockManager.RemovePiece<GripModule>(Blueprint.GripModulePrototype.ToString());
-            neededMoveModule = stockManager.RemovePiece<MoveModule>(Blueprint.MoveModulePrototype.ToString());
-        }
-
-        Console.WriteLine("GET_OUT_STOCK 1 " + neededCore);
-        Console.WriteLine("GET_OUT_STOCK 1 " + neededGenerator);
-        Console.WriteLine("GET_OUT_STOCK 1 " + neededGripModule);
-        Console.WriteLine("GET_OUT_STOCK 1 " + neededMoveModule);
-
-        if (!simulate) neededCore.InstallSystem(systemToInstall);
-        Console.WriteLine("INSTALL " + systemToInstall + " " + neededCore);
-
-        var assemblyTmp1 = new AssembledPiece([neededCore, neededGenerator], "TMP1");
+        var assemblyTmp1 = new AssembledPiece([robotComponents.Core, robotComponents.Generator], "TMP1");
         if (!simulate)
         {
-            Core = neededCore;
-            Generator = neededGenerator;
+            Core = robotComponents.Core;
+            Generator = robotComponents.Generator;
         }
 
-        Console.WriteLine("ASSEMBLE " + assemblyTmp1 + " " + neededCore + " " + neededGenerator);
+        Console.WriteLine("ASSEMBLE " + assemblyTmp1 + " " + robotComponents.Core + " " + robotComponents.Generator);
 
-        var assemblyTmp2 = new AssembledPiece([assemblyTmp1, neededGripModule]);
-        if (!simulate) GripModule = neededGripModule;
-        Console.WriteLine("ASSEMBLE " + assemblyTmp1 + " " + neededGripModule);
+        var assemblyTmp2 = new AssembledPiece([assemblyTmp1, robotComponents.GripModule]);
+        if (!simulate) GripModule = robotComponents.GripModule;
+        Console.WriteLine("ASSEMBLE " + assemblyTmp1 + " " + robotComponents.GripModule);
 
-        var assemblyTmp3 = new AssembledPiece([assemblyTmp2, neededMoveModule], "TMP3");
-        if (!simulate) MoveModule = neededMoveModule;
-        Console.WriteLine("ASSEMBLE " + assemblyTmp3 + " " + assemblyTmp2 + " " + neededMoveModule);
+        var assemblyTmp3 = new AssembledPiece([assemblyTmp2, robotComponents.MoveModule], "TMP3");
+        if (!simulate) MoveModule = robotComponents.MoveModule;
+        Console.WriteLine("ASSEMBLE " + assemblyTmp3 + " " + assemblyTmp2 + " " + robotComponents.MoveModule);
 
         Console.WriteLine("FINISHED " + Name);
     }

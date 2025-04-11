@@ -10,7 +10,7 @@ public class RobotBuildTests
     private static readonly Dictionary<string, StockItem> Stock;
     private static readonly StockManager StockManager;
     private static readonly System SystemToInstall;
-    
+
     static RobotBuildTests()
     {
         Stock = new Dictionary<string, StockItem>
@@ -31,29 +31,33 @@ public class RobotBuildTests
         StockManager = StockManager.GetInstance(Stock);
         SystemToInstall = new System(SystemNames.Sb1);
     }
-    
+
     [Fact]
     public void Should_BuildRobot_And_UpdateStock_When_ValidBlueprintProvided()
     {
         var robot = new Rd1();
         const string expectedName = "RD-1";
+
         var expectedCore = new Core(CoreNames.Cd1);
         var expectedGenerator = new Generator(GeneratorNames.Gd1);
         var expectedGripModule = new GripModule(GripModuleNames.Ad1);
         var expectedMoveModule = new MoveModule(MoveModuleNames.Ld1);
 
-        robot.Build(StockManager, SystemToInstall);
+        var robotComponents = StockManager.GetRobotComponents(robot.Blueprint);
+
+        robot.Build(robotComponents, SystemToInstall);
+        StockManager.AddRobot(robot);
 
         Assert.Equal(expectedName, robot.ToString());
         Assert.Equal(expectedCore, robot.Core);
         Assert.Equal(expectedGenerator, robot.Generator);
         Assert.Equal(expectedGripModule, robot.GripModule);
         Assert.Equal(expectedMoveModule, robot.MoveModule);
-        
-        Assert.Equal(4, Stock[expectedCore.ToString()].Quantity);
-        Assert.Equal(4, Stock[expectedGenerator.ToString()].Quantity);
-        Assert.Equal(4, Stock[expectedGripModule.ToString()].Quantity);
-        Assert.Equal(4, Stock[expectedMoveModule.ToString()].Quantity);
+
+        Assert.Equal(4, StockManager.GetPieceStock[expectedCore.ToString()].Quantity);
+        Assert.Equal(4, StockManager.GetPieceStock[expectedGenerator.ToString()].Quantity);
+        Assert.Equal(4, StockManager.GetPieceStock[expectedGripModule.ToString()].Quantity);
+        Assert.Equal(4, StockManager.GetPieceStock[expectedMoveModule.ToString()].Quantity);
         Assert.Equal(1, StockManager.GetRobotStocks[robot.ToString()].Quantity);
     }
 }

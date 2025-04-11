@@ -10,7 +10,7 @@ public class CommandHandler
     private static readonly IReadOnlyDictionary<string, StockItem> PieceStock = StockManager.GetPieceStock;
     private static readonly IReadOnlyDictionary<string, RobotStockItem> RobotStock = StockManager.GetRobotStocks;
 
-    private static readonly System SystemToInstall = new (SystemNames.Sb1);
+    private static readonly System SystemToInstall = new(SystemNames.Sb1);
 
     /// <summary>
     /// Gère l'exécution d'une commande utilisateur
@@ -80,7 +80,8 @@ public class CommandHandler
 
                         for (var i = 0; i < count; i++)
                         {
-                            robotToBuild.Build(StockManager, SystemToInstall, true);
+                            var robotComponents = StockManager.GetRobotComponents(robotToBuild.Blueprint, true);
+                            robotToBuild.Build(robotComponents, SystemToInstall, true);
                         }
                     }
 
@@ -115,7 +116,8 @@ public class CommandHandler
 
                         for (var i = 0; i < count; i++)
                         {
-                            robotToBuild.Build(StockManager, SystemToInstall);
+                            var robotComponents = StockManager.GetRobotComponents(robotToBuild.Blueprint);
+                            robotToBuild.Build(robotComponents, SystemToInstall);
                             StockManager.AddRobot(robotToBuild);
                         }
                     }
@@ -199,7 +201,7 @@ public class CommandHandler
     {
         foreach (var robot in RobotStock)
             Console.WriteLine($"{robot.Value.Quantity} {robot.Key}");
-        
+
         foreach (var piece in PieceStock)
             Console.WriteLine($"{piece.Value.Quantity} {piece.Key}");
     }

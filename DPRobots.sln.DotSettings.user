@@ -12,6 +12,7 @@
     &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.Robots.RobotBuildTests.Should_BuildRobot_And_UpdateStock_When_ValidBlueprintProvided&lt;/TestId&gt;
     &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.Stock.StockManagerTests&lt;/TestId&gt;
     &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.CommandHandlerTest&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.Robots.RobotBuildTests&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>
