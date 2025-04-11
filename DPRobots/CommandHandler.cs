@@ -200,10 +200,10 @@ public class CommandHandler
     private static void DisplayStock()
     {
         foreach (var robot in RobotStock)
-            Console.WriteLine($"{robot.Value.Quantity} {robot.Key}");
+            Console.WriteLine($"{robot.Value.Quantity} {robot.Value.RobotPrototype}");
 
         foreach (var piece in PieceStock)
-            Console.WriteLine($"{piece.Value.Quantity} {piece.Key}");
+            Console.WriteLine($"{piece.Value.Quantity} {piece.Value.Prototype}");
     }
 
     /// <summary>

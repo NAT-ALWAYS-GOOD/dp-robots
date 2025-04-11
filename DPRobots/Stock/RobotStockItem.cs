@@ -4,7 +4,7 @@ namespace DPRobots.Stock;
 
 public class RobotStockItem(Robot robotPrototype, int quantity)
 {
-    public Robot RobotPrototype { get; } = robotPrototype;
+    public readonly Robot RobotPrototype = robotPrototype;
     public int Quantity { get; private set; } = quantity;
 
     public void IncreaseQuantity(int amount)
