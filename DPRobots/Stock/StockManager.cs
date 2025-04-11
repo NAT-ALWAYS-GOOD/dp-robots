@@ -5,19 +5,21 @@ namespace DPRobots.Stock;
 
 public class StockManager(Dictionary<string, StockItem> stock)
 {
-    private readonly Dictionary<string, StockItem> _stocks = stock;
-    private readonly Dictionary<string, RobotStockItem> _robotStocks = new Dictionary<string, RobotStockItem>();
+    private readonly Dictionary<string, RobotStockItem> _robotStocks = new();
 
-    public static StockManager? Instance { get; private set; }
+    private static StockManager? _instance;
 
-    public static void Initialize(Dictionary<string, StockItem> stock)
+    public static StockManager GetInstance(Dictionary<string, StockItem>? stock = null)
     {
-        Instance = new StockManager(stock);
+        if (_instance != null)
+            return _instance;
+
+        return _instance = new StockManager(stock ?? new Dictionary<string, StockItem>());
     }
 
     public T RemovePiece<T>(string key) where T : Piece
     {
-        var stockItem = _stocks.GetValueOrDefault(key);
+        var stockItem = stock.GetValueOrDefault(key);
         if (stockItem == null)
             throw new InvalidOperationException($"No stock item found for key: {key}");
 
@@ -35,6 +37,6 @@ public class StockManager(Dictionary<string, StockItem> stock)
             _robotStocks[key] = new RobotStockItem(robot, 1);
     }
 
-    public IReadOnlyDictionary<string, StockItem> GetPieceStock => _stocks;
+    public IReadOnlyDictionary<string, StockItem> GetPieceStock => stock;
     public IReadOnlyDictionary<string, RobotStockItem> GetRobotStocks => _robotStocks;
 }

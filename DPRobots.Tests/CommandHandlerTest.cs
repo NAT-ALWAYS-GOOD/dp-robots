@@ -21,7 +21,7 @@ public class CommandHandlerTest
             { "Legs_LM1", new StockItem(new MoveModule(MoveModuleNames.Lm1), 5) },
         };
         CommandHandler = new CommandHandler();
-        StockManager.Initialize(Stock);
+        StockManager.GetInstance(Stock);
     }
 
     [Fact]
@@ -199,7 +199,7 @@ public class CommandHandlerTest
         Assert.Contains("FINISHED XM-1", result);
 
         // verify stock
-        Assert.Equal(1, StockManager.Instance!.GetRobotStocks["XM-1"].Quantity);
+        Assert.Equal(1, StockManager.GetInstance().GetRobotStocks["XM-1"].Quantity);
     }
 
     [Fact]

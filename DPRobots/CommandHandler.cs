@@ -6,7 +6,7 @@ namespace DPRobots;
 
 public class CommandHandler
 {
-    private static readonly StockManager StockManager = StockManager.Instance!;
+    private static readonly StockManager StockManager = StockManager.GetInstance();
     private static readonly IReadOnlyDictionary<string, StockItem> PieceStock = StockManager.GetPieceStock;
     private static readonly IReadOnlyDictionary<string, RobotStockItem> RobotStock = StockManager.GetRobotStocks;
 
