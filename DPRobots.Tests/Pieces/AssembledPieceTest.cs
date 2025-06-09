@@ -8,11 +8,11 @@ public class AssembledPieceTest
     [Fact]
     public void Should_Create_AssembledPiece()
     {
-        var core = new Core(CoreNames.Cm1);
-        var system = new System(SystemNames.Sb1);
+        var core = new Core(CoreNames.Cm1, PieceCategory.Military);
+        var system = new System(SystemNames.Sb1, PieceCategory.General);
         core.InstallSystem(system);
         
-        var generator = new Generator(GeneratorNames.Gm1);
+        var generator = new Generator(GeneratorNames.Gm1, PieceCategory.Military);
 
         var tmp1 = new AssembledPiece([core, generator], "TMP1");
         
@@ -22,11 +22,11 @@ public class AssembledPieceTest
     [Fact]
     public void Should_Create_A_Computedly_Named_AssembledPiece()
     {
-        var core = new Core(CoreNames.Cm1);
-        var system = new System(SystemNames.Sb1);
+        var core = new Core(CoreNames.Cm1, PieceCategory.Military);
+        var system = new System(SystemNames.Sb1, PieceCategory.General);
         core.InstallSystem(system);
         
-        var generator = new Generator(GeneratorNames.Gm1);
+        var generator = new Generator(GeneratorNames.Gm1, PieceCategory.Military);
 
         var assembledPiece = new AssembledPiece([core, generator]);
         
@@ -36,15 +36,15 @@ public class AssembledPieceTest
     [Fact]
     public void Should_Create_A_Computedly_Named_AssembledPiece_With_AssembledPieces()
     {
-        var core = new Core(CoreNames.Cm1);
-        var system = new System(SystemNames.Sb1);
+        var core = new Core(CoreNames.Cm1, PieceCategory.Military);
+        var system = new System(SystemNames.Sb1, PieceCategory.General);
         core.InstallSystem(system);
         
-        var generator = new Generator(GeneratorNames.Gm1);
+        var generator = new Generator(GeneratorNames.Gm1, PieceCategory.Military);
 
         var firstAssembledPiece = new AssembledPiece([core, generator]);
         
-        var moveModule = new MoveModule(MoveModuleNames.Ld1);
+        var moveModule = new MoveModule(MoveModuleNames.Ld1, PieceCategory.Domestic);
         
         var secondAssembledPiece = new AssembledPiece([firstAssembledPiece, moveModule]);
         

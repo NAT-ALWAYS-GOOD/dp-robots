@@ -18,13 +18,13 @@ public class AssembledPiece : Piece
         return new AssembledPiece(clonedPieces);
     }
 
-    public AssembledPiece(List<Piece> pieces) : base(ComputeName(pieces))
+    public AssembledPiece(List<Piece> pieces) : base(ComputeName(pieces), null)
     {
         VerifyPieces(pieces);
         Pieces = Flatten(pieces);
     }
 
-    public AssembledPiece(List<Piece> pieces, string name) : base(name)
+    public AssembledPiece(List<Piece> pieces, string name) : base(name, null)
     {
         VerifyPieces(pieces);
         Pieces = Flatten(pieces);

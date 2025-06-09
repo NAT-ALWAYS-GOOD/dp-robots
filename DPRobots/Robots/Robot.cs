@@ -1,5 +1,4 @@
 using DPRobots.Pieces;
-using DPRobots.Stock;
 
 namespace DPRobots.Robots;
 
@@ -16,7 +15,7 @@ public abstract class Robot
     public void Build(RobotComponents robotComponents, System systemToInstall, bool simulate = false)
     {
         Console.WriteLine("PRODUCING " + Name);
-        
+
         Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.Core);
         Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.Generator);
         Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.GripModule);

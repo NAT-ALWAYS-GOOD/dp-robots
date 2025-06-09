@@ -7,9 +7,10 @@ public enum CoreNames
     Ci1
 }
 
-public class Core(CoreNames name): Piece(name.ToString())
+public class Core(CoreNames name, PieceCategory category): Piece(name.ToString(), category)
 {
     private readonly CoreNames _name = name;
+    private readonly PieceCategory _category = category;
     
     private System? _system;
     
@@ -20,7 +21,7 @@ public class Core(CoreNames name): Piece(name.ToString())
 
     public override object Clone()
     {
-        return new Core(_name);
+        return new Core(_name, _category);
     }
 
     public override string ToString()

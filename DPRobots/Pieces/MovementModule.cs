@@ -7,13 +7,14 @@ public enum MoveModuleNames
     Li1
 }
 
-public class MoveModule(MoveModuleNames name) : Piece(name.ToString())
+public class MoveModule(MoveModuleNames name, PieceCategory category) : Piece(name.ToString(), category)
 {
     private readonly MoveModuleNames _name = name;
+    private readonly PieceCategory _category = category;
 
     public override object Clone()
     {
-        return new MoveModule(_name);
+        return new MoveModule(_name, _category);
     }
 
     public override string ToString()

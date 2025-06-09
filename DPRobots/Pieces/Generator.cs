@@ -7,13 +7,14 @@ public enum GeneratorNames
     Gi1
 }
 
-public class Generator(GeneratorNames name): Piece(name.ToString())
+public class Generator(GeneratorNames name, PieceCategory category): Piece(name.ToString(), category)
 {
     private readonly GeneratorNames _name = name;
+    private readonly PieceCategory _category = category;
 
     public override object Clone()
     {
-        return new Generator(_name);
+        return new Generator(_name, _category);
     }
 
     public override string ToString()

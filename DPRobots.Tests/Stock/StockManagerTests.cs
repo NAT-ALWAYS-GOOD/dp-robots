@@ -10,7 +10,7 @@ public class StockManagerTests
     [Fact]
     public void Should_Throw_InvalidOperationException_When_StockIsNotAvailable()
     {
-        var piece = new Core(CoreNames.Cd1);
+        var piece = new Core(CoreNames.Cd1, PieceCategory.Domestic);
         var stockItem = new StockItem(piece, 0);
         var stockManager = new StockManager(new Dictionary<string, StockItem>
         {
@@ -25,7 +25,7 @@ public class StockManagerTests
     [Fact]
     public void Should_RemovePiece_When_StockIsAvailable()
     {
-        var piece = new Core(CoreNames.Cd1);
+        var piece = new Core(CoreNames.Cd1, PieceCategory.Domestic);
         var stockItem = new StockItem(piece, 5);
         var stockManager = new StockManager(new Dictionary<string, StockItem>
         {

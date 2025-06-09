@@ -7,13 +7,14 @@ public enum GripModuleNames
     Ai1
 }
 
-public class GripModule(GripModuleNames name): Piece(name.ToString())
+public class GripModule(GripModuleNames name, PieceCategory category): Piece(name.ToString(), category)
 {
     private readonly GripModuleNames _name = name;
+    private readonly PieceCategory _category = category;
     
     public override object Clone()
     {
-        return new GripModule(_name);
+        return new GripModule(_name, _category);
     }
     
     public override string ToString()
