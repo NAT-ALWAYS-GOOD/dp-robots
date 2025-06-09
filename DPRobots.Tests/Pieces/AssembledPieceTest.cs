@@ -8,11 +8,11 @@ public class AssembledPieceTest
     [Fact]
     public void Should_Create_AssembledPiece()
     {
-        var core = new Core(CoreNames.Cm1, PieceCategory.Military);
-        var system = new System(SystemNames.Sb1, PieceCategory.General);
+        var core = (Core)PieceFactory.Create("Core_CM1");
+        var system = (System)PieceFactory.Create("System_SB1");
         core.InstallSystem(system);
         
-        var generator = new Generator(GeneratorNames.Gm1, PieceCategory.Military);
+        var generator = (Generator)PieceFactory.Create("Generator_GM1");
 
         var tmp1 = new AssembledPiece([core, generator], "TMP1");
         
@@ -22,11 +22,11 @@ public class AssembledPieceTest
     [Fact]
     public void Should_Create_A_Computedly_Named_AssembledPiece()
     {
-        var core = new Core(CoreNames.Cm1, PieceCategory.Military);
-        var system = new System(SystemNames.Sb1, PieceCategory.General);
+        var core = (Core)PieceFactory.Create("Core_CM1");
+        var system = (System)PieceFactory.Create("System_SB1");
         core.InstallSystem(system);
         
-        var generator = new Generator(GeneratorNames.Gm1, PieceCategory.Military);
+        var generator = (Generator)PieceFactory.Create("Generator_GM1");
 
         var assembledPiece = new AssembledPiece([core, generator]);
         
@@ -36,15 +36,15 @@ public class AssembledPieceTest
     [Fact]
     public void Should_Create_A_Computedly_Named_AssembledPiece_With_AssembledPieces()
     {
-        var core = new Core(CoreNames.Cm1, PieceCategory.Military);
-        var system = new System(SystemNames.Sb1, PieceCategory.General);
+        var core = (Core)PieceFactory.Create("Core_CM1");
+        var system = (System)PieceFactory.Create("System_SM1");
         core.InstallSystem(system);
         
-        var generator = new Generator(GeneratorNames.Gm1, PieceCategory.Military);
+        var generator = (Generator)PieceFactory.Create("Generator_GM1");
 
         var firstAssembledPiece = new AssembledPiece([core, generator]);
         
-        var moveModule = new MoveModule(MoveModuleNames.Ld1, PieceCategory.Domestic);
+        var moveModule = (MoveModule)PieceFactory.Create("Legs_LD1");
         
         var secondAssembledPiece = new AssembledPiece([firstAssembledPiece, moveModule]);
         
