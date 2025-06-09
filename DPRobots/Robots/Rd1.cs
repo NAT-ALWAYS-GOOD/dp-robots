@@ -7,7 +7,10 @@ public class Rd1 : Robot
     protected override string Name => "RD-1";
     
     public override RobotBlueprint Blueprint => new RobotBlueprint(
+        "RD-1",
+        RobotCategory.Domestic,
         new Core(CoreNames.Cd1, PieceCategory.Domestic),
+        new System(SystemNames.Sb1, SystemCategory.General),
         new Generator(GeneratorNames.Gd1, PieceCategory.Domestic),
         new GripModule(GripModuleNames.Ad1, PieceCategory.Domestic),
         new MoveModule(MoveModuleNames.Ld1, PieceCategory.Domestic)

@@ -9,7 +9,7 @@ public class AssembledPieceTest
     public void Should_Create_AssembledPiece()
     {
         var core = new Core(CoreNames.Cm1, PieceCategory.Military);
-        var system = new System(SystemNames.Sb1, PieceCategory.General);
+        var system = new System(SystemNames.Sb1, SystemCategory.General);
         core.InstallSystem(system);
         
         var generator = new Generator(GeneratorNames.Gm1, PieceCategory.Military);
@@ -23,7 +23,7 @@ public class AssembledPieceTest
     public void Should_Create_A_Computedly_Named_AssembledPiece()
     {
         var core = new Core(CoreNames.Cm1, PieceCategory.Military);
-        var system = new System(SystemNames.Sb1, PieceCategory.General);
+        var system = new System(SystemNames.Sb1, SystemCategory.General);
         core.InstallSystem(system);
         
         var generator = new Generator(GeneratorNames.Gm1, PieceCategory.Military);
@@ -37,7 +37,7 @@ public class AssembledPieceTest
     public void Should_Create_A_Computedly_Named_AssembledPiece_With_AssembledPieces()
     {
         var core = new Core(CoreNames.Cm1, PieceCategory.Military);
-        var system = new System(SystemNames.Sb1, PieceCategory.General);
+        var system = new System(SystemNames.Sb1, SystemCategory.General);
         core.InstallSystem(system);
         
         var generator = new Generator(GeneratorNames.Gm1, PieceCategory.Military);
