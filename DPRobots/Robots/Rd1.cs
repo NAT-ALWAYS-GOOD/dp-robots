@@ -10,7 +10,7 @@ public class Rd1 : Robot
         "RD-1",
         RobotCategory.Domestic,
         new Core(CoreNames.Cd1, PieceCategory.Domestic),
-        new System(SystemNames.Sb1, SystemCategory.General),
+        new System(SystemNames.Sb1, PieceCategory.General),
         new Generator(GeneratorNames.Gd1, PieceCategory.Domestic),
         new GripModule(GripModuleNames.Ad1, PieceCategory.Domestic),
         new MoveModule(MoveModuleNames.Ld1, PieceCategory.Domestic)

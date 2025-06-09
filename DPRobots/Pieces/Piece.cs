@@ -3,7 +3,7 @@ namespace DPRobots.Pieces;
 public abstract class Piece(string name, PieceCategory? category) : ICloneable, IEquatable<Piece>
 {
     private readonly string _name = name;
-    private readonly PieceCategory? _category = category;
+    public readonly PieceCategory? Category = category;
 
     public abstract object Clone();
 

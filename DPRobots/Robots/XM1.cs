@@ -10,7 +10,7 @@ public class Xm1 : Robot
         "XM-1",
         RobotCategory.Military,
         new Core(CoreNames.Cm1, PieceCategory.Military),
-        new System(SystemNames.Sb1, SystemCategory.General),
+        new System(SystemNames.Sb1, PieceCategory.General),
         new Generator(GeneratorNames.Gm1, PieceCategory.Military),
         new GripModule(GripModuleNames.Am1, PieceCategory.Military),
         new MoveModule(MoveModuleNames.Lm1, PieceCategory.Military)

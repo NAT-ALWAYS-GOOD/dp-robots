@@ -29,7 +29,7 @@ public class RobotBuildTests
             { "Legs_LI1", new StockItem(new MoveModule(MoveModuleNames.Li1, PieceCategory.Industrial), 5) },
         };
         StockManager = StockManager.GetInstance(Stock);
-        SystemToInstall = new System(SystemNames.Sb1, SystemCategory.General);
+        SystemToInstall = new System(SystemNames.Sb1, PieceCategory.General);
     }
 
     [Fact]

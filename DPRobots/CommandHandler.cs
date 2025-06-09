@@ -11,7 +11,7 @@ public class CommandHandler
     private static readonly IReadOnlyDictionary<string, StockItem> PieceStock = StockManager.GetPieceStock;
     private static readonly IReadOnlyDictionary<string, RobotStockItem> RobotStock = StockManager.GetRobotStocks;
 
-    private static readonly System SystemToInstall = new(SystemNames.Sb1, SystemCategory.General);
+    private static readonly System SystemToInstall = new(SystemNames.Sb1, PieceCategory.General);
 
     /// <summary>
     /// Gère l'exécution d'une commande utilisateur

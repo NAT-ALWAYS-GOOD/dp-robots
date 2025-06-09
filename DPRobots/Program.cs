@@ -9,6 +9,8 @@ public class Program
 {
     public static void Main(string[] args)
     {
+        RobotTemplates.InitializeTemplates();
+        
         var stock = new Dictionary<string, StockItem>
         {
             { "Core_CD1", new StockItem(new Core(CoreNames.Cd1, PieceCategory.Domestic), 5) },
