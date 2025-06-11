@@ -1,3 +1,4 @@
+using DPRobots.Instructions;
 using DPRobots.Pieces;
 
 namespace DPRobots.Robots;
@@ -14,34 +15,40 @@ public abstract class Robot
 
     public void Build(RobotComponents robotComponents, System systemToInstall, bool simulate = false)
     {
-        Console.WriteLine("PRODUCING " + Name);
-
-        Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.Core);
-        Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.Generator);
-        Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.GripModule);
-        Console.WriteLine("GET_OUT_STOCK 1 " + robotComponents.MoveModule);
-
-        if (!simulate) robotComponents.Core.InstallSystem(systemToInstall);
-        Console.WriteLine("INSTALL " + systemToInstall + " " + robotComponents.Core);
-
         var assemblyTmp1 = new AssembledPiece([robotComponents.Core, robotComponents.Generator], "TMP1");
-        if (!simulate)
+        var instructionsList = new List<Instruction>
         {
-            Core = robotComponents.Core;
-            Generator = robotComponents.Generator;
-        }
+            new ProduceInstruction(Name),
+            new GetOutStockInstruction(robotComponents.Core),
+            new GetOutStockInstruction(robotComponents.Generator),
+            new GetOutStockInstruction(robotComponents.GripModule),
+            new GetOutStockInstruction(robotComponents.MoveModule),
+            new InstallSystemInstruction(systemToInstall, robotComponents.Core),
+            new AssembleInstruction("TMP1", robotComponents.Core, robotComponents.Generator),
+            new AssembleInstruction(
+                null,
+                assemblyTmp1,
+                robotComponents.GripModule
+            ),
+            new AssembleInstruction(
+                "TMP3",
+                new AssembledPiece([
+                    assemblyTmp1,
+                    robotComponents.GripModule,
+                ]),
+                robotComponents.MoveModule
+            ),
+            new FinishInstruction(Name),
+        };
 
-        Console.WriteLine("ASSEMBLE " + assemblyTmp1 + " " + robotComponents.Core + " " + robotComponents.Generator);
+        foreach (var instruction in instructionsList) Console.WriteLine(instruction);
 
-        var assemblyTmp2 = new AssembledPiece([assemblyTmp1, robotComponents.GripModule]);
-        if (!simulate) GripModule = robotComponents.GripModule;
-        Console.WriteLine("ASSEMBLE " + assemblyTmp1 + " " + robotComponents.GripModule);
-
-        var assemblyTmp3 = new AssembledPiece([assemblyTmp2, robotComponents.MoveModule], "TMP3");
-        if (!simulate) MoveModule = robotComponents.MoveModule;
-        Console.WriteLine("ASSEMBLE " + assemblyTmp3 + " " + assemblyTmp2 + " " + robotComponents.MoveModule);
-
-        Console.WriteLine("FINISHED " + Name);
+        if (simulate) return;
+        robotComponents.Core.InstallSystem(systemToInstall);
+        Core = robotComponents.Core;
+        Generator = robotComponents.Generator;
+        GripModule = robotComponents.GripModule;
+        MoveModule = robotComponents.MoveModule;
     }
 
     public override string ToString() => Name;

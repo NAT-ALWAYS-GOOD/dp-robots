@@ -51,4 +51,6 @@ public class AssembledPiece : Piece
     {
         return "[" + string.Join(",", pieces.Select(p => p.ToString())) + "]";
     }
+    
+    public bool IsAnonymous => ToString().StartsWith("[");
 }
