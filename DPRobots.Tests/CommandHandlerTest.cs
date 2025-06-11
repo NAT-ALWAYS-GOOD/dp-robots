@@ -21,7 +21,8 @@ public class CommandHandlerTest
             { "Legs_LM1", new StockItem(new MoveModule(MoveModuleNames.Lm1, PieceCategory.Military), 5) },
         };
         CommandHandler = new CommandHandler();
-        StockManager.GetInstance(Stock);
+        var stockManager = StockManager.GetInstance();
+        stockManager.Initialize(Stock);
     }
 
     [Fact]

@@ -26,7 +26,8 @@ public class Program
             { "Legs_LD1", new StockItem(new MoveModule(MoveModuleNames.Ld1, PieceCategory.Domestic), 5) },
             { "Legs_LI1", new StockItem(new MoveModule(MoveModuleNames.Li1, PieceCategory.Industrial), 5) },
         };
-        StockManager.GetInstance(stock);
+        var stockManager = StockManager.GetInstance();
+        stockManager.Initialize(stock);
 
         Console.WriteLine("Tapez votre commande ou 'EXIT' pour quitter.");
 

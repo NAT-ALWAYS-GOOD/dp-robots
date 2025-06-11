@@ -12,7 +12,8 @@ public class StockManagerTests
     {
         var piece = (Core)PieceFactory.Create("Core_CD1");
         var stockItem = new StockItem(piece, 0);
-        var stockManager = new StockManager(new Dictionary<string, StockItem>
+        var stockManager = new StockManager();
+        stockManager.Initialize(new Dictionary<string, StockItem>
         {
             { stockItem.ToString(), stockItem }
         });
@@ -27,7 +28,8 @@ public class StockManagerTests
     {
         var piece = (Core)PieceFactory.Create("Core_CD1");
         var stockItem = new StockItem(piece, 5);
-        var stockManager = new StockManager(new Dictionary<string, StockItem>
+        var stockManager = new StockManager();
+        stockManager.Initialize(new Dictionary<string, StockItem>
         {
             { stockItem.ToString(), stockItem }
         });
@@ -42,7 +44,7 @@ public class StockManagerTests
     [Fact]
     public void Should_Throw_InvalidOperationException_When_StockItemNotFound()
     {
-        var stockManager = StockManager.GetInstance(new Dictionary<string, StockItem>());
+        var stockManager = StockManager.GetInstance();
         var exception =
             Assert.Throws<InvalidOperationException>(() => stockManager.RemovePiece<Piece>("NonExistentKey"));
         Assert.Equal("No stock item found for key: NonExistentKey", exception.Message);
@@ -52,7 +54,7 @@ public class StockManagerTests
     public void Should_AddRobot_When_RobotIsAdded()
     {
         var robot = new Rd1();
-        var stockManager = StockManager.GetInstance(new Dictionary<string, StockItem>());
+        var stockManager = StockManager.GetInstance();
 
         stockManager.AddRobot(robot);
 
@@ -64,12 +66,12 @@ public class StockManagerTests
     public void Should_IncreaseRobotQuantity_When_RobotAlreadyExists()
     {
         var robot = new Rd1();
-        var stockManager = StockManager.GetInstance(new Dictionary<string, StockItem>());
+        var stockManager = StockManager.GetInstance();
 
         stockManager.AddRobot(robot);
         stockManager.AddRobot(robot);
 
         Assert.True(stockManager.GetRobotStocks.ContainsKey(robot.ToString()));
-        Assert.Equal(3, stockManager.GetRobotStocks[robot.ToString()].Quantity);
+        Assert.Equal(2, stockManager.GetRobotStocks[robot.ToString()].Quantity);
     }
 }

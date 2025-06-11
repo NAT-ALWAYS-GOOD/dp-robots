@@ -3,23 +3,31 @@ using DPRobots.Robots;
 
 namespace DPRobots.Stock;
 
-public class StockManager(Dictionary<string, StockItem> stock)
+public class StockManager
 {
+    private Dictionary<string, StockItem> _stock = new();
+    
     private readonly Dictionary<string, RobotStockItem> _robotStocks = new();
 
     private static StockManager? _instance;
 
-    public static StockManager GetInstance(Dictionary<string, StockItem>? stock = null)
+    public static StockManager GetInstance()
     {
         if (_instance != null)
             return _instance;
 
-        return _instance = new StockManager(stock ?? new Dictionary<string, StockItem>());
+        return _instance = new StockManager();
+    }
+    
+    public void Initialize(Dictionary<string, StockItem> initialStock)
+    {
+        _stock = initialStock;
+        _instance = this;
     }
 
     public T RemovePiece<T>(string key) where T : Piece
     {
-        var stockItem = stock.GetValueOrDefault(key);
+        var stockItem = _stock.GetValueOrDefault(key);
         if (stockItem == null)
             throw new InvalidOperationException($"No stock item found for key: {key}");
 
@@ -48,6 +56,6 @@ public class StockManager(Dictionary<string, StockItem> stock)
     }
     
 
-    public IReadOnlyDictionary<string, StockItem> GetPieceStock => stock;
+    public IReadOnlyDictionary<string, StockItem> GetPieceStock => _stock;
     public IReadOnlyDictionary<string, RobotStockItem> GetRobotStocks => _robotStocks;
 }
