@@ -2,7 +2,7 @@ using DPRobots.Pieces;
 
 namespace DPRobots.Instructions;
 
-public record AssembleInstruction(string? OutputName, Piece Piece1, Piece Piece2) : Instruction
+public record AssembleInstruction(string? OutputName, Piece Piece1, Piece Piece2) : IInstruction
 {
     public override string ToString()
     {

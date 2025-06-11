@@ -16,7 +16,7 @@ public abstract class Robot
     public void Build(RobotComponents robotComponents, System systemToInstall, bool simulate = false)
     {
         var assemblyTmp1 = new AssembledPiece([robotComponents.Core, robotComponents.Generator], "TMP1");
-        var instructionsList = new List<Instruction>
+        var instructionsList = new List<INstruction>
         {
             new ProduceInstruction(Name),
             new GetOutStockInstruction(robotComponents.Core),

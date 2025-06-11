@@ -1,6 +1,6 @@
 namespace DPRobots.Instructions;
 
-public interface Instruction
+public interface IInstruction
 {
     string ToString();
 }
