@@ -6,6 +6,16 @@ namespace DPRobots.Robots;
 public class RobotTemplates
 {
     private static readonly Dictionary<string, RobotBlueprint> Templates = new();
+    
+    private static RobotTemplates? _instance;
+
+    public static RobotTemplates GetInstance()
+    {
+        if (_instance != null)
+            return _instance;
+
+        return _instance = new RobotTemplates();
+    }
 
     private static void Add(RobotBlueprint template)
     {
@@ -19,7 +29,7 @@ public class RobotTemplates
         return Templates.GetValueOrDefault(name);
     }
 
-    public static void InitializeTemplates()
+    public void InitializeTemplates()
     {
         Add(new RobotBlueprint(
             "XM-1",

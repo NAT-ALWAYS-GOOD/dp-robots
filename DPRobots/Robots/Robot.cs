@@ -12,11 +12,27 @@ public abstract class Robot
     public Generator? Generator { get; private set; }
     public GripModule? GripModule { get; private set; }
     public MoveModule? MoveModule { get; private set; }
+    
+    /// <summary>
+    /// Récupère le robot correspondant au nom donné.
+    /// Si le nom ne correspond à aucun robot connu, retourne null.
+    /// </summary>
+    /// <param name="robotName"></param>
+    public static Robot? FromName(string robotName)
+    {
+        return robotName.ToUpper() switch
+        {
+            "XM-1" => new Xm1(),
+            "RD-1" => new Rd1(),
+            "WI-1" => new Wi1(),
+            _ => null
+        };
+    }
 
     public void Build(RobotComponents robotComponents, System systemToInstall, bool simulate = false)
     {
         var assemblyTmp1 = new AssembledPiece([robotComponents.Core, robotComponents.Generator], "TMP1");
-        var instructionsList = new List<INstruction>
+        var instructionsList = new List<IInstruction>
         {
             new ProduceInstruction(Name),
             new GetOutStockInstruction(robotComponents.Core),
@@ -49,6 +65,17 @@ public abstract class Robot
         Generator = robotComponents.Generator;
         GripModule = robotComponents.GripModule;
         MoveModule = robotComponents.MoveModule;
+    }
+    
+    public List<Piece> GetNeededPieces()
+    {
+        return
+        [
+            Blueprint.CorePrototype,
+            Blueprint.GeneratorPrototype,
+            Blueprint.GripModulePrototype,
+            Blueprint.MoveModulePrototype
+        ];
     }
 
     public override string ToString() => Name;

@@ -11,18 +11,18 @@ public class CommandHandlerTest
 
     static CommandHandlerTest()
     {
-        Dictionary<string, StockItem> Stock = new Dictionary<string, StockItem>
-        {
-            { "Core_CD1", new StockItem(new Core(CoreNames.Cd1, PieceCategory.Domestic), 5) },
-            { "Core_CM1", new StockItem(new Core(CoreNames.Cm1, PieceCategory.Military), 5) },
-            { "Core_CI1", new StockItem(new Core(CoreNames.Ci1, PieceCategory.Industrial), 5) },
-            { "Generator_GM1", new StockItem(new Generator(GeneratorNames.Gm1, PieceCategory.Military), 5) },
-            { "Arms_AM1", new StockItem(new GripModule(GripModuleNames.Am1, PieceCategory.Military), 5) },
-            { "Legs_LM1", new StockItem(new MoveModule(MoveModuleNames.Lm1, PieceCategory.Military), 5) },
-        };
+        List<StockItem> stock =
+        [
+            new(new Core(CoreNames.Cd1, PieceCategory.Domestic), 5),
+            new(new Core(CoreNames.Cm1, PieceCategory.Military), 5),
+            new(new Core(CoreNames.Ci1, PieceCategory.Industrial), 5),
+            new(new Generator(GeneratorNames.Gm1, PieceCategory.Military), 5),
+            new(new GripModule(GripModuleNames.Am1, PieceCategory.Military), 5),
+            new(new MoveModule(MoveModuleNames.Lm1, PieceCategory.Military), 5)
+        ];
         CommandHandler = new CommandHandler();
         var stockManager = StockManager.GetInstance();
-        stockManager.Initialize(Stock);
+        stockManager.Initialize(stock);
     }
 
     [Fact]
@@ -200,7 +200,9 @@ public class CommandHandlerTest
         Assert.Contains("FINISHED XM-1", result);
 
         // verify stock
-        Assert.Equal(1, StockManager.GetInstance().GetRobotStocks["XM-1"].Quantity);
+        Assert.Equal(1,
+            StockManager.GetInstance().GetRobotStocks.Where(item => item.RobotPrototype.ToString() == "XM-1")
+                .FirstOrDefault()?.Quantity);
     }
 
     [Fact]

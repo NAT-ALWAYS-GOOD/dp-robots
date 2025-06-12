@@ -8,8 +8,8 @@ namespace DPRobots;
 public class CommandHandler
 {
     private static readonly StockManager StockManager = StockManager.GetInstance();
-    private static readonly IReadOnlyDictionary<string, StockItem> PieceStock = StockManager.GetPieceStock;
-    private static readonly IReadOnlyDictionary<string, RobotStockItem> RobotStock = StockManager.GetRobotStocks;
+    private static readonly IReadOnlyList<StockItem> PieceStock = StockManager.GetPieceStock;
+    private static readonly IReadOnlyList<RobotStockItem> RobotStock = StockManager.GetRobotStocks;
 
     private static readonly System SystemToInstall = new(SystemNames.Sb1, PieceCategory.General);
 
@@ -201,10 +201,10 @@ public class CommandHandler
     private static void DisplayStock()
     {
         foreach (var robot in RobotStock)
-            Console.WriteLine($"{robot.Value.Quantity} {robot.Value.RobotPrototype}");
+            Console.WriteLine($"{robot.Quantity} {robot.RobotPrototype}");
 
         foreach (var piece in PieceStock)
-            Console.WriteLine($"{piece.Value.Quantity} {piece.Value.Prototype}");
+            Console.WriteLine($"{piece.Quantity} {piece.Prototype}");
     }
 
     /// <summary>
@@ -241,7 +241,9 @@ public class CommandHandler
 
         foreach (var piece in overallTotals)
         {
-            var available = PieceStock.TryGetValue(piece.Key, out var stockItem) ? stockItem.Quantity : 0;
+            var available = PieceStock
+                .Where(stockItem => stockItem.Prototype.Equals(piece.Key))
+                .Sum(stockItem => stockItem.Quantity);
             if (available >= piece.Value)
                 continue;
 
@@ -262,51 +264,34 @@ public class CommandHandler
         return false;
     }
 
-    private static Dictionary<string, int> CalculateOverallNeededStocks(Dictionary<string, int> robotRequests,
+
+    private static Dictionary<Piece, int> CalculateOverallNeededStocks(Dictionary<string, int> robotRequests,
         bool printDetails = false)
     {
-        var overallTotals = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-
-        void AddToTotal(string pieceName, int quantity)
-        {
-            if (!overallTotals.TryAdd(pieceName, quantity))
-                overallTotals[pieceName] += quantity;
-        }
+        var overallTotals = new Dictionary<Piece, int>();
 
         foreach (var (robotName, count) in robotRequests)
         {
-            var robot = GetRobotByName(robotName);
+            var robot = Robot.FromName(robotName);
             if (robot == null) continue;
 
-            var pieceNames = GetNeededPieceNames(robot);
+            var pieces = robot.GetNeededPieces();
 
             if (printDetails)
             {
                 Console.WriteLine($"{count} {robotName} :");
-                foreach (var pieceName in pieceNames)
+                foreach (var piece in pieces)
                 {
-                    Console.WriteLine($"    {count} {pieceName}");
+                    Console.WriteLine($"    {count} {piece}");
                 }
             }
 
-            foreach (var pieceName in pieceNames)
+            foreach (var pieceName in pieces.Where(pieceName => !overallTotals.TryAdd(pieceName, count)))
             {
-                AddToTotal(pieceName, count);
+                overallTotals[pieceName] += count;
             }
         }
 
         return overallTotals;
-
-        IEnumerable<string> GetNeededPieceNames(Robot robot)
-        {
-            var blueprint = robot.Blueprint;
-            return
-            [
-                blueprint.CorePrototype.ToString(),
-                blueprint.GeneratorPrototype.ToString(),
-                blueprint.GripModulePrototype.ToString(),
-                blueprint.MoveModulePrototype.ToString()
-            ];
-        }
     }
 }
