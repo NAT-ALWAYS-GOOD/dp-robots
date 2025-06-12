@@ -1,3 +1,4 @@
+using DPRobots.Logging;
 using DPRobots.Pieces;
 using DPRobots.Robots;
 
@@ -5,9 +6,9 @@ namespace DPRobots.Stock;
 
 public class StockManager
 {
-    private List<StockItem> _stock = new();
-    
-    private readonly List<RobotStockItem> _robotStocks = new();
+    private static List<StockItem> _stocks = new();
+
+    private static readonly List<RobotStockItem> RobotStocks = new();
 
     private static StockManager? _instance;
 
@@ -18,16 +19,16 @@ public class StockManager
 
         return _instance = new StockManager();
     }
-    
+
     public void Initialize(List<StockItem> initialStock)
     {
-        _stock = initialStock;
+        _stocks = initialStock;
         _instance = this;
     }
 
-    public T RemovePiece<T>(Piece piece) where T : Piece
+    public static T RemovePiece<T>(Piece piece) where T : Piece
     {
-        var stockItem = _stock.Find(item => item.Prototype.Equals(piece));
+        var stockItem = _stocks.Find(item => item.Prototype.Equals(piece));
         if (stockItem == null)
             throw new InvalidOperationException($"No stock item found for piece: {piece}");
 
@@ -36,21 +37,23 @@ public class StockManager
         return (T)stockItem.Prototype.Clone();
     }
 
-    public void AddRobot(Robot robot)
+    public static void AddRobot(Robot robot)
     {
-        var robotStockItem = _robotStocks.Find(item => item.RobotPrototype == robot);
+        var robotStockItem = RobotStocks.Find(item => item.RobotPrototype == robot);
         if (robotStockItem != null)
             robotStockItem.IncreaseQuantity(1);
         else
-            _robotStocks.Add(new RobotStockItem(robot, 1));
+            RobotStocks.Add(new RobotStockItem(robot, 1));
     }
-    
-    public RobotComponents GetRobotComponents(RobotBlueprint blueprint, bool simulate = false)
+
+    public static RobotComponents GetRobotComponents(RobotBlueprint blueprint, bool simulate = false)
     {
         var core = simulate ? blueprint.CorePrototype : RemovePiece<Core>(blueprint.CorePrototype);
         var generator = simulate ? blueprint.GeneratorPrototype : RemovePiece<Generator>(blueprint.GeneratorPrototype);
-        var gripModule = simulate ? blueprint.GripModulePrototype : RemovePiece<GripModule>(blueprint.GripModulePrototype);
-        var moveModule = simulate ? blueprint.MoveModulePrototype : RemovePiece<MoveModule>(blueprint.MoveModulePrototype);
+        var gripModule =
+            simulate ? blueprint.GripModulePrototype : RemovePiece<GripModule>(blueprint.GripModulePrototype);
+        var moveModule =
+            simulate ? blueprint.MoveModulePrototype : RemovePiece<MoveModule>(blueprint.MoveModulePrototype);
 
         return new RobotComponents(core, generator, gripModule, moveModule);
     }
@@ -61,54 +64,56 @@ public class StockManager
     // }
 
 
-    private static Dictionary<string, int> CalculateOverallNeededStocks(Dictionary<string, int> robotRequests,
+    public static Dictionary<Piece, int> CalculateOverallNeededStocks(Dictionary<Robot, int> robotRequests,
         bool printDetails = false)
     {
-        var overallTotals = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var overallTotals = new Dictionary<Piece, int>();
 
-        void AddToTotal(string pieceName, int quantity)
+        void AddToTotal(Piece piece, int quantity)
         {
-            if (!overallTotals.TryAdd(pieceName, quantity))
-                overallTotals[pieceName] += quantity;
+            if (!overallTotals.TryAdd(piece, quantity))
+                overallTotals[piece] += quantity;
         }
 
-        foreach (var (robotName, count) in robotRequests)
+        foreach (var (robot, count) in robotRequests)
         {
-            var robot = Robot.FromName(robotName);
-            if (robot == null) continue;
-
-            var pieceNames = GetNeededPieceNames(robot);
+            List<Piece> neededPieces = robot.GetNeededPieces();
 
             if (printDetails)
             {
-                Console.WriteLine($"{count} {robotName} :");
-                foreach (var pieceName in pieceNames)
+                Console.WriteLine($"{count} {robot} :");
+                foreach (var piece in neededPieces)
                 {
-                    Console.WriteLine($"    {count} {pieceName}");
+                    Console.WriteLine($"    {count} {piece}");
                 }
             }
 
-            foreach (var pieceName in pieceNames)
+            foreach (var piece in neededPieces)
             {
-                AddToTotal(pieceName, count);
+                AddToTotal(piece, count);
             }
         }
 
         return overallTotals;
-
-        IEnumerable<string> GetNeededPieceNames(Robot robot)
-        {
-            var blueprint = robot.Blueprint;
-            return
-            [
-                blueprint.CorePrototype.ToString(),
-                blueprint.GeneratorPrototype.ToString(),
-                blueprint.GripModulePrototype.ToString(),
-                blueprint.MoveModulePrototype.ToString()
-            ];
-        }
     }
 
-    public IReadOnlyList<StockItem> GetPieceStock => _stock;
-    public IReadOnlyList<RobotStockItem> GetRobotStocks => _robotStocks;
+    public static bool VerifyRequestedQuantitiesAreAvailable(Dictionary<Robot, int> requestedRobotsWithQuantities)
+    {
+        var overallTotals = CalculateOverallNeededStocks(requestedRobotsWithQuantities);
+
+        foreach (var pieceWithQuantity in overallTotals)
+        {
+            var available = _stocks.Where(stockItem => stockItem.Prototype.Equals(pieceWithQuantity.Key))
+                .Sum(stockItem => stockItem.Quantity);
+            if (available >= pieceWithQuantity.Value)
+                continue;
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public IReadOnlyList<StockItem> GetPieceStocks => _stocks;
+    public IReadOnlyList<RobotStockItem> GetRobotStocks => RobotStocks;
 }

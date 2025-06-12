@@ -16,7 +16,7 @@ public class StockManagerTests
         stockManager.Initialize([stockItem]);
 
         var exception =
-            Assert.Throws<InvalidOperationException>(() => stockManager.RemovePiece<Piece>(stockItem.Prototype));
+            Assert.Throws<InvalidOperationException>(() => StockManager.RemovePiece<Piece>(stockItem.Prototype));
         Assert.Equal($"Not enough stock for {piece}", exception.Message);
     }
 
@@ -28,7 +28,7 @@ public class StockManagerTests
         var stockManager = new StockManager();
         stockManager.Initialize([stockItem]);
 
-        var removedPiece = stockManager.RemovePiece<Piece>(stockItem.Prototype);
+        var removedPiece = StockManager.RemovePiece<Piece>(stockItem.Prototype);
 
         Assert.Equal(piece.ToString(), removedPiece.ToString());
         Assert.IsType<Core>(removedPiece);
@@ -38,10 +38,9 @@ public class StockManagerTests
     [Fact]
     public void Should_Throw_InvalidOperationException_When_StockItemNotFound()
     {
-        var stockManager = StockManager.GetInstance();
         var item = new Generator(name: GeneratorNames.Gm1, category: PieceCategory.Military);
         var exception =
-            Assert.Throws<InvalidOperationException>(() => stockManager.RemovePiece<Piece>(item));
+            Assert.Throws<InvalidOperationException>(() => StockManager.RemovePiece<Piece>(item));
         Assert.Equal($"No stock item found for piece: {item}", exception.Message);
     }
 
@@ -51,7 +50,7 @@ public class StockManagerTests
         var robot = new Rd1();
         var stockManager = StockManager.GetInstance();
 
-        stockManager.AddRobot(robot);
+        StockManager.AddRobot(robot);
 
         Assert.True(stockManager.GetRobotStocks.SingleOrDefault(item => item.RobotPrototype == robot) != null);
         Assert.Equal(1, stockManager.GetRobotStocks.Where(item => item.RobotPrototype == robot).First().Quantity);
@@ -63,8 +62,8 @@ public class StockManagerTests
         var robot = new Rd1();
         var stockManager = StockManager.GetInstance();
 
-        stockManager.AddRobot(robot);
-        stockManager.AddRobot(robot);
+        StockManager.AddRobot(robot);
+        StockManager.AddRobot(robot);
 
         Assert.True(stockManager.GetRobotStocks.SingleOrDefault(item => item.RobotPrototype == robot) != null);
         Assert.Equal(2, stockManager.GetRobotStocks.Where(item => item.RobotPrototype == robot).First().Quantity);

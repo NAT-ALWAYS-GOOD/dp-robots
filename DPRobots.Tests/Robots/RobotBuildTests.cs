@@ -55,24 +55,24 @@ public class RobotBuildTests
         Assert.Equal(expectedMoveModule, robot.MoveModule);
 
         Assert.Equal(4,
-            StockManager.GetPieceStock
+            StockManager.GetPieceStocks
                 .Where(stockItem => stockItem.Prototype.Equals(expectedCore))
                 .First()
                 .Quantity
         );
         Assert.Equal(4,
-            StockManager.GetPieceStock
+            StockManager.GetPieceStocks
                 .Where(stockItem => stockItem.Prototype.Equals(expectedGenerator))
                 .First()
                 .Quantity
         );
         Assert.Equal(4,
-            StockManager.GetPieceStock
+            StockManager.GetPieceStocks
                 .Where(stockItem => stockItem.Prototype.Equals(expectedGripModule))
                 .First()
                 .Quantity);
         Assert.Equal(4,
-            StockManager.GetPieceStock
+            StockManager.GetPieceStocks
                 .Where(stockItem => stockItem.Prototype.Equals(expectedMoveModule))
                 .First()
                 .Quantity);

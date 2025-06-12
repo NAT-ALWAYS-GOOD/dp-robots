@@ -2,14 +2,14 @@ using DPRobots.Logging;
 using DPRobots.Pieces;
 using DPRobots.Robots;
 using DPRobots.Stock;
+using DPRobots.UserInstructions;
 
 namespace DPRobots;
 
 public class CommandHandler
 {
     private static readonly StockManager StockManager = StockManager.GetInstance();
-    private static readonly IReadOnlyList<StockItem> PieceStock = StockManager.GetPieceStock;
-    private static readonly IReadOnlyList<RobotStockItem> RobotStock = StockManager.GetRobotStocks;
+    private static readonly IReadOnlyList<StockItem> PieceStock = StockManager.GetPieceStocks;
 
     private static readonly System SystemToInstall = new(SystemNames.Sb1, PieceCategory.General);
 
@@ -59,14 +59,15 @@ public class CommandHandler
                         return;
                     }
 
-                    DisplayStock();
+                    StocksUserInstruction.Execute();
                     break;
 
                 case "NEEDED_STOCKS":
-                    var neededStocks = ValidateAndParseArgs(args, "NEEDED_STOCKS");
-                    if (neededStocks == null) return;
-                    if (!VerifyRobots(neededStocks)) return;
-                    DisplayNeededStocks(neededStocks);
+                    var neededStocksArgs = ValidateAndParseArgs(args, "NEEDED_STOCKS");
+                    if (neededStocksArgs == null) return;
+                    if (!VerifyRobots(neededStocksArgs)) return;
+
+                    NeededStocksUserInstruction.Execute(neededStocksArgs);
                     break;
 
                 case "INSTRUCTIONS":
@@ -74,55 +75,23 @@ public class CommandHandler
                     if (instructionsArgs == null) return;
                     if (!VerifyRobots(instructionsArgs)) return;
 
-                    foreach (var (robotName, count) in instructionsArgs)
-                    {
-                        var robotToBuild = GetRobotByName(robotName);
-                        if (robotToBuild == null) continue;
-
-                        for (var i = 0; i < count; i++)
-                        {
-                            var robotComponents = StockManager.GetRobotComponents(robotToBuild.Blueprint, true);
-                            robotToBuild.Build(robotComponents, SystemToInstall, true);
-                        }
-                    }
-
+                    InstructionsUserInstruction.Execute(instructionsArgs);
                     break;
 
                 case "VERIFY":
                     var verifyArgs = ValidateAndParseArgs(args, "VERIFY");
                     if (verifyArgs == null) return;
                     if (!VerifyRobots(verifyArgs)) return;
-                    if (VerifyCommandIsAvailable(verifyArgs))
-                        Logger.Log(LogType.AVAILABLE);
-                    else
-                        Logger.Log(LogType.UNAVAILABLE);
 
+                    VerifyUserInstruction.Execute(verifyArgs);
                     break;
 
                 case "PRODUCE":
                     var produceArgs = ValidateAndParseArgs(args, "PRODUCE");
                     if (produceArgs == null) return;
                     if (!VerifyRobots(produceArgs)) return;
-
-                    if (!VerifyCommandIsAvailable(produceArgs))
-                    {
-                        Logger.Log(LogType.ERROR, "Impossible de produire les robots, pas assez de pièces.");
-                        return;
-                    }
-
-                    foreach (var (robotName, count) in produceArgs)
-                    {
-                        var robotToBuild = GetRobotByName(robotName);
-                        if (robotToBuild == null) continue;
-
-                        for (var i = 0; i < count; i++)
-                        {
-                            var robotComponents = StockManager.GetRobotComponents(robotToBuild.Blueprint);
-                            robotToBuild.Build(robotComponents, SystemToInstall);
-                            StockManager.AddRobot(robotToBuild);
-                        }
-                    }
-
+                    
+                    ProduceUserInstruction.Execute(produceArgs);
                     break;
 
                 default:
@@ -198,100 +167,14 @@ public class CommandHandler
         return null;
     }
 
-    private static void DisplayStock()
-    {
-        foreach (var robot in RobotStock)
-            Console.WriteLine($"{robot.Quantity} {robot.RobotPrototype}");
-
-        foreach (var piece in PieceStock)
-            Console.WriteLine($"{piece.Quantity} {piece.Prototype}");
-    }
-
-    /// <summary>
-    /// Récupère le robot correspondant au nom donné.
-    /// Si le nom ne correspond à aucun robot connu, retourne null.
-    /// </summary>
-    /// <param name="robotName"></param>
-    private static Robot? GetRobotByName(string robotName)
-    {
-        return robotName.ToUpper() switch
-        {
-            "XM-1" => new Xm1(),
-            "RD-1" => new Rd1(),
-            "WI-1" => new Wi1(),
-            _ => null
-        };
-    }
-
-    private static void DisplayNeededStocks(Dictionary<string, int> robotRequests)
-    {
-        var overallTotals = CalculateOverallNeededStocks(robotRequests, true);
-
-        if (overallTotals.Count == 0)
-            return;
-
-        Console.WriteLine("Total:");
-        foreach (var total in overallTotals)
-            Console.WriteLine($"{total.Value} {total.Key}");
-    }
-
-    private static bool VerifyCommandIsAvailable(Dictionary<string, int> robotRequests)
-    {
-        var overallTotals = CalculateOverallNeededStocks(robotRequests);
-
-        foreach (var piece in overallTotals)
-        {
-            var available = PieceStock
-                .Where(stockItem => stockItem.Prototype.Equals(piece.Key))
-                .Sum(stockItem => stockItem.Quantity);
-            if (available >= piece.Value)
-                continue;
-
-            return false;
-        }
-
-        return true;
-    }
-
     private static bool VerifyRobots(Dictionary<string, int> robotRequests)
     {
         var invalidRobot = robotRequests.Keys
-            .FirstOrDefault(robotName => GetRobotByName(robotName) == null);
+            .FirstOrDefault(robotName => Robot.FromName(robotName) == null);
 
         if (invalidRobot == null) return true;
 
         Logger.Log(LogType.ERROR, $"'{invalidRobot}' is not a recognized robot");
         return false;
-    }
-
-
-    private static Dictionary<Piece, int> CalculateOverallNeededStocks(Dictionary<string, int> robotRequests,
-        bool printDetails = false)
-    {
-        var overallTotals = new Dictionary<Piece, int>();
-
-        foreach (var (robotName, count) in robotRequests)
-        {
-            var robot = Robot.FromName(robotName);
-            if (robot == null) continue;
-
-            var pieces = robot.GetNeededPieces();
-
-            if (printDetails)
-            {
-                Console.WriteLine($"{count} {robotName} :");
-                foreach (var piece in pieces)
-                {
-                    Console.WriteLine($"    {count} {piece}");
-                }
-            }
-
-            foreach (var pieceName in pieces.Where(pieceName => !overallTotals.TryAdd(pieceName, count)))
-            {
-                overallTotals[pieceName] += count;
-            }
-        }
-
-        return overallTotals;
     }
 }
