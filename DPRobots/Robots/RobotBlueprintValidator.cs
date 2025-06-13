@@ -2,57 +2,53 @@ using DPRobots.Pieces;
 
 namespace DPRobots.Robots;
 
-public class RobotBlueprintValidator
+public static class RobotBlueprintValidator
 {
+    private static readonly Dictionary<RobotCategory, HashSet<PieceCategory>> AllowedPieceCategories = new()
+    {
+        [RobotCategory.Domestic] = [PieceCategory.Domestic, PieceCategory.General, PieceCategory.Industrial],
+        [RobotCategory.Industrial] = [PieceCategory.General, PieceCategory.Industrial],
+        [RobotCategory.Military] = [PieceCategory.Military, PieceCategory.Industrial]
+    };
+
+    private static readonly Dictionary<RobotCategory, HashSet<PieceCategory>> AllowedSystemCategories = new()
+    {
+        [RobotCategory.Domestic] = [PieceCategory.Domestic, PieceCategory.General, PieceCategory.Industrial],
+        [RobotCategory.Industrial] = [PieceCategory.General, PieceCategory.Industrial],
+        [RobotCategory.Military] = [PieceCategory.Military, PieceCategory.General]
+    };
+
     public static bool IsValid(RobotBlueprint blueprint)
     {
-        RobotCategory category = blueprint.Category;
-        
-        List<Piece> pieces =
-        [
-            blueprint.CorePrototype,
-            blueprint.GeneratorPrototype,
-            blueprint.GripModulePrototype,
-            blueprint.MoveModulePrototype
-        ];
-        List<PieceCategory> allowedPieceCategories = category switch
-        {
-            RobotCategory.Domestic =>
-            [
-                PieceCategory.Domestic,
-                PieceCategory.General,
-                PieceCategory.Industrial
-            ],
-            RobotCategory.Industrial =>
-            [
-                PieceCategory.Industrial,
-                PieceCategory.General
-            ],
-            RobotCategory.Military =>
-            [
-                PieceCategory.Military,
-                PieceCategory.Industrial
-            ],
-            _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
-        };
-        foreach (Piece piece in pieces)
-        {
-            PieceCategory? pieceCategory = piece.Category;
-            if (pieceCategory == null || !allowedPieceCategories.Contains(pieceCategory.Value))
-                return false;
-        }
-        
-        System system = blueprint.SystemPrototype;
-        List<PieceCategory> allowedSystemCategories = category switch
-        {
-            RobotCategory.Domestic => [PieceCategory.Domestic, PieceCategory.General, PieceCategory.Industrial],
-            RobotCategory.Industrial => [PieceCategory.General, PieceCategory.Industrial],
-            RobotCategory.Military => [PieceCategory.Military, PieceCategory.General],
-            _ => throw new ArgumentOutOfRangeException(nameof(category), category, null)
-        };
-        if (system.Category == null || !allowedSystemCategories.Contains(system.Category.Value))
-            return false;
+        return TryInferCategory(blueprint, out _);
+    }
 
-        return true;
+    public static bool TryInferCategory(RobotBlueprint blueprint, out RobotCategory category)
+    {
+        var pieceCategories = new[]
+        {
+            blueprint.CorePrototype.Category,
+            blueprint.GeneratorPrototype.Category,
+            blueprint.GripModulePrototype.Category,
+            blueprint.MoveModulePrototype.Category
+        };
+
+        var systemCategory = blueprint.SystemPrototype.Category;
+
+        foreach (var cat in Enum.GetValues<RobotCategory>())
+        {
+            var allowedPieces = AllowedPieceCategories[cat];
+            var allowedSystems = AllowedSystemCategories[cat];
+
+            if (pieceCategories.All(c => c.HasValue && allowedPieces.Contains(c.Value))
+                && systemCategory.HasValue && allowedSystems.Contains(systemCategory.Value))
+            {
+                category = cat;
+                return true;
+            }
+        }
+
+        category = default;
+        return false;
     }
 }

@@ -6,6 +6,7 @@ public class Robot(String name, RobotBlueprint blueprint)
 {
     protected string Name { get; } = name;
     public RobotBlueprint Blueprint { get; } = blueprint;
+    public RobotCategory? Category => Blueprint.InferredCategory;
     public Core? Core { get; internal set; }
     public Generator? Generator { get; internal set; }
     public GripModule? GripModule { get; internal set; }

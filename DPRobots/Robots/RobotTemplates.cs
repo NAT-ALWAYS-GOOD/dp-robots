@@ -33,7 +33,6 @@ public class RobotTemplates
     {
         Add(new RobotBlueprint(
             "XM-1",
-            RobotCategory.Military,
             (Core)PieceFactory.Create("Core_CM1"),
             (System)PieceFactory.Create("System_SB1"),
             (Generator)PieceFactory.Create("Generator_GM1"),
@@ -43,7 +42,6 @@ public class RobotTemplates
 
         Add(new RobotBlueprint(
             "RD-1",
-            RobotCategory.Domestic,
             (Core)PieceFactory.Create("Core_CD1"),
             (System)PieceFactory.Create("System_SB1"),
             (Generator)PieceFactory.Create("Generator_GD1"),
@@ -53,7 +51,6 @@ public class RobotTemplates
 
         Add(new RobotBlueprint(
             "WI-1",
-            RobotCategory.Industrial,
             (Core)PieceFactory.Create("Core_CI1"),
             (System)PieceFactory.Create("System_SB1"),
             (Generator)PieceFactory.Create("Generator_GI1"),

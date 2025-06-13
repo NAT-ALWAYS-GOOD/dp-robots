@@ -4,10 +4,22 @@ namespace DPRobots.Robots;
 
 public record RobotBlueprint(
     string Name,
-    RobotCategory Category,
     Core CorePrototype,
     System SystemPrototype,
     Generator GeneratorPrototype,
     GripModule GripModulePrototype,
     MoveModule MoveModulePrototype
-);
+)
+{
+    public RobotCategory? InferredCategory
+    {
+        get
+        {
+            return RobotBlueprintValidator.TryInferCategory(this, out var category)
+                ? category
+                : null;
+        }
+    }
+
+    public bool IsValid => InferredCategory != null;
+}
