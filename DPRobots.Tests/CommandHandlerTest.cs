@@ -1,5 +1,6 @@
 using DPRobots.Logging;
 using DPRobots.Pieces;
+using DPRobots.Robots;
 using DPRobots.Stock;
 using Xunit;
 
@@ -7,6 +8,11 @@ namespace DPRobots.Tests;
 
 public class CommandHandlerTest
 {
+    public CommandHandlerTest()
+    {
+        RobotTemplates.GetInstance().InitializeTemplates();
+    }
+    
     private static readonly CommandHandler CommandHandler;
 
     static CommandHandlerTest()
@@ -147,6 +153,7 @@ public class CommandHandlerTest
     {
         var output = new StringWriter();
         Console.SetOut(output);
+        
         const string command = "INSTRUCTIONS 1 XM-1";
 
         CommandHandler.HandleCommand(command);
@@ -183,6 +190,14 @@ public class CommandHandlerTest
     {
         var output = new StringWriter();
         Console.SetOut(output);
+        
+        StockManager.GetInstance().Initialize([
+            new StockItem(PieceFactory.Create("Core_CM1"), 10),
+            new StockItem(PieceFactory.Create("Generator_GM1"), 10),
+            new StockItem(PieceFactory.Create("Arms_AM1"), 10),
+            new StockItem(PieceFactory.Create("Legs_LM1"), 10)
+        ]);
+        
         const string command = "PRODUCE 1 XM-1";
 
         CommandHandler.HandleCommand(command);

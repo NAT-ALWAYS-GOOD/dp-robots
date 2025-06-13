@@ -11,13 +11,12 @@ public record InstructionsUserInstruction : IUserInstruction
     {
         foreach (var (robotName, count) in robotsWithQuantities)
         {
-            var robotToBuild = Robot.FromName(robotName);
-            if (robotToBuild == null) continue;
-
             for (var i = 0; i < count; i++)
             {
-                var robotComponents = StockManager.GetRobotComponents(robotToBuild.Blueprint, true);
-                robotToBuild.Build(robotComponents, robotToBuild.Blueprint.SystemPrototype, true);
+                new RobotBuilder(robotName)
+                    .UseTemplate()
+                    .GenerateInstructions()
+                    .Simulate();
             }
         }
     }

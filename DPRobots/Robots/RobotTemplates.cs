@@ -34,31 +34,31 @@ public class RobotTemplates
         Add(new RobotBlueprint(
             "XM-1",
             RobotCategory.Military,
-            new Core(CoreNames.Cm1, PieceCategory.Military),
-            new System(SystemNames.Sb1, PieceCategory.General),
-            new Generator(GeneratorNames.Gm1, PieceCategory.Military),
-            new GripModule(GripModuleNames.Am1, PieceCategory.Military),
-            new MoveModule(MoveModuleNames.Lm1, PieceCategory.Military)
+            (Core)PieceFactory.Create("Core_CM1"),
+            (System)PieceFactory.Create("System_SB1"),
+            (Generator)PieceFactory.Create("Generator_GM1"),
+            (GripModule)PieceFactory.Create("Arms_AM1"),
+            (MoveModule)PieceFactory.Create("Legs_LM1")
         ));
 
         Add(new RobotBlueprint(
             "RD-1",
             RobotCategory.Domestic,
-            new Core(CoreNames.Cd1, PieceCategory.Domestic),
-            new System(SystemNames.Sb1, PieceCategory.General),
-            new Generator(GeneratorNames.Gd1, PieceCategory.Domestic),
-            new GripModule(GripModuleNames.Ad1, PieceCategory.Domestic),
-            new MoveModule(MoveModuleNames.Ld1, PieceCategory.Domestic)
+            (Core)PieceFactory.Create("Core_CD1"),
+            (System)PieceFactory.Create("System_SB1"),
+            (Generator)PieceFactory.Create("Generator_GD1"),
+            (GripModule)PieceFactory.Create("Arms_AD1"),
+            (MoveModule)PieceFactory.Create("Legs_LD1")
         ));
 
         Add(new RobotBlueprint(
             "WI-1",
             RobotCategory.Industrial,
-            new Core(CoreNames.Ci1, PieceCategory.Industrial),
-            new System(SystemNames.Sb1, PieceCategory.General),
-            new Generator(GeneratorNames.Gi1, PieceCategory.Industrial),
-            new GripModule(GripModuleNames.Ai1, PieceCategory.Industrial),
-            new MoveModule(MoveModuleNames.Li1, PieceCategory.Industrial)
+            (Core)PieceFactory.Create("Core_CI1"),
+            (System)PieceFactory.Create("System_SB1"),
+            (Generator)PieceFactory.Create("Generator_GI1"),
+            (GripModule)PieceFactory.Create("Arms_AI1"),
+            (MoveModule)PieceFactory.Create("Legs_LI1")
         ));
     }
 }

@@ -174,7 +174,7 @@ public class CommandHandler
 
         if (invalidRobot == null) return true;
 
-        Logger.Log(LogType.ERROR, $"'{invalidRobot}' is not a recognized robot");
+        Logger.Log(LogType.ERROR, $"`{invalidRobot}` is not a recognized robot");
         return false;
     }
 }

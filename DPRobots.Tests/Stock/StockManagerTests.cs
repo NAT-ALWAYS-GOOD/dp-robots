@@ -47,25 +47,36 @@ public class StockManagerTests
     [Fact]
     public void Should_AddRobot_When_RobotIsAdded()
     {
-        var robot = new Rd1();
-        var stockManager = StockManager.GetInstance();
+        StockManager.GetInstance().Initialize([
+            new StockItem(PieceFactory.Create("Core_CD1"), 10),
+            new StockItem(PieceFactory.Create("Generator_GD1"), 10),
+            new StockItem(PieceFactory.Create("Arms_AD1"), 10),
+            new StockItem(PieceFactory.Create("Legs_LD1"), 10)
+        ]);
+        var robot = Robot.FromName("RD-1");
 
         StockManager.AddRobot(robot);
 
-        Assert.True(stockManager.GetRobotStocks.SingleOrDefault(item => item.RobotPrototype == robot) != null);
-        Assert.Equal(1, stockManager.GetRobotStocks.Where(item => item.RobotPrototype == robot).First().Quantity);
+        Assert.True(StockManager.GetInstance().GetRobotStocks.SingleOrDefault(item => item.RobotPrototype == robot) != null);
+        Assert.Equal(1, StockManager.GetInstance().GetRobotStocks.Where(item => item.RobotPrototype == robot).First().Quantity);
     }
 
     [Fact]
     public void Should_IncreaseRobotQuantity_When_RobotAlreadyExists()
     {
-        var robot = new Rd1();
-        var stockManager = StockManager.GetInstance();
+        StockManager.GetInstance().Initialize([
+            new StockItem(PieceFactory.Create("Core_CD1"), 10),
+            new StockItem(PieceFactory.Create("Generator_GD1"), 10),
+            new StockItem(PieceFactory.Create("Arms_AD1"), 10),
+            new StockItem(PieceFactory.Create("Legs_LD1"), 10)
+        ]);
+        var robot = Robot.FromName("RD-1");
 
         StockManager.AddRobot(robot);
         StockManager.AddRobot(robot);
 
-        Assert.True(stockManager.GetRobotStocks.SingleOrDefault(item => item.RobotPrototype == robot) != null);
-        Assert.Equal(2, stockManager.GetRobotStocks.Where(item => item.RobotPrototype == robot).First().Quantity);
+        Assert.NotNull(robot);
+        Assert.True(StockManager.GetInstance().GetRobotStocks.SingleOrDefault(item => item.RobotPrototype == robot) != null);
+        Assert.Equal(2, StockManager.GetInstance().GetRobotStocks.Where(item => item.RobotPrototype == robot).First().Quantity);
     }
 }

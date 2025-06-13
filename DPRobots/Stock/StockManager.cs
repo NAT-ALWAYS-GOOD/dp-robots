@@ -37,8 +37,10 @@ public class StockManager
         return (T)stockItem.Prototype.Clone();
     }
 
-    public static void AddRobot(Robot robot)
+    public static void AddRobot(Robot? robot)
     {
+        if (robot == null) return;
+        
         var robotStockItem = RobotStocks.Find(item => item.RobotPrototype == robot);
         if (robotStockItem != null)
             robotStockItem.IncreaseQuantity(1);

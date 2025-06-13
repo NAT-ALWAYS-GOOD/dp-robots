@@ -23,9 +23,11 @@ public record ProduceUserInstruction : IUserInstruction
         {
             for (var i = 0; i < count; i++)
             {
-                var robotComponents = StockManager.GetRobotComponents(robotToBuild.Blueprint);
-                robotToBuild.Build(robotComponents, robotToBuild.Blueprint.SystemPrototype);
-                StockManager.AddRobot(robotToBuild);
+                var robot = new RobotBuilder(robotToBuild.ToString())
+                    .UseTemplate()
+                    .GenerateInstructions()
+                    .Build();
+                StockManager.AddRobot(robot);
             }
         }
     }
