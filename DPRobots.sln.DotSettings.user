@@ -1,18 +1,12 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AArgumentException_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F23b393789bb834fac8f4c285f7e317cf0a0b42874eedab1321366c175116c_003FArgumentException_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AAssert_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FDecompilerCache_003Fdecompiler_003F8517f607c12a4b508364c3f896f0fe6f11da8_003F9b_003F15941b48_003FAssert_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AFirst_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F97366fb8b8c6d11b1906babc1c6efdf5ff2d9f5cb45ef5b8c49fd859b1ebd_003FFirst_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AObject_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003FLibrary_003FApplication_0020Support_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003F68b06b8592b1287fd78f3ee68566d6a38d6e2f45b9a9e6ebd4d0e9972f7c29_003FObject_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/PencilsConfiguration/ActualSeverity/@EntryValue">INFO</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestProjectMapping/=CF34C64F_002D69BC_002D47EB_002DBE62_002D3A364117665F/@EntryIndexedValue">12E6B385-B158-4534-AD2E-A2DFC8C91EC0</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestTemplateMapping/=xUnit/@EntryIndexedValue">33ff99d8-b1ad-4ed5-a4fd-376b97c2c841</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=810ff67a_002Df74c_002D4f3f_002D8d0c_002Dd7a70fac5e1e/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="AssembledPieceTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
-  &lt;TestAncestor&gt;
-    &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.Pieces.AssembledPieceTest&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.Stock.StockManagerTests.Should_RemovePiece_When_StockIsAvailable&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.Robots.RobotBuildTests.Should_BuildRobot_And_UpdateStock_When_ValidBlueprintProvided&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.Stock.StockManagerTests&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.CommandHandlerTest&lt;/TestId&gt;
-    &lt;TestId&gt;xUnit::12E6B385-B158-4534-AD2E-A2DFC8C91EC0::net8.0::DPRobots.Tests.Robots.RobotBuildTests&lt;/TestId&gt;
-  &lt;/TestAncestor&gt;
+  &lt;Project Location="/Users/aea/development/csharp/projects/dp-robots/DPRobots.Tests" Presentation="&amp;lt;DPRobots.Tests&amp;gt;" /&gt;
 &lt;/SessionState&gt;</s:String>
 	</wpf:ResourceDictionary>

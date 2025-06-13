@@ -5,7 +5,9 @@ namespace DPRobots.UserInstructions;
 
 public record InstructionsUserInstruction : IUserInstruction
 {
-    public override string ToString() => "INSTRUCTIONS";
+    public const string CommandName = "INSTRUCTIONS";
+
+    public override string ToString() => CommandName;
 
     public static void Execute(Dictionary<string, int> robotsWithQuantities)
     {

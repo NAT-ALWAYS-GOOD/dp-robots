@@ -1,18 +1,11 @@
 using DPRobots.Logging;
-using DPRobots.Pieces;
 using DPRobots.Robots;
-using DPRobots.Stock;
 using DPRobots.UserInstructions;
 
 namespace DPRobots;
 
 public class CommandHandler
 {
-    private static readonly StockManager StockManager = StockManager.GetInstance();
-    private static readonly IReadOnlyList<StockItem> PieceStock = StockManager.GetPieceStocks;
-
-    private static readonly System SystemToInstall = new(SystemNames.Sb1, PieceCategory.General);
-
     /// <summary>
     /// Gère l'exécution d'une commande utilisateur
     /// Format attendu => INSTRUCTION ARGS
@@ -37,60 +30,55 @@ public class CommandHandler
 
             switch (instruction.ToUpper())
             {
-                case "HELP":
+                case HelpUserInstruction.CommandName:
                     if (!IsArgsEmpty(args))
                     {
-                        Logger.Log(LogType.ERROR, "La commande HELP ne prend pas d'arguments.");
+                        Logger.Log(LogType.ERROR, $"La commande {HelpUserInstruction.CommandName} ne prend pas d'arguments.");
                         return;
                     }
 
-                    Console.WriteLine("Liste des commandes disponibles :");
-                    Console.WriteLine("STOCKS : Affiche les stocks disponibles.");
-                    Console.WriteLine("NEEDED_STOCKS : Affiche les stocks requis pour construire les robots.");
-                    Console.WriteLine("INSTRUCTIONS : Affiche les instructions de construction des robots.");
-                    Console.WriteLine("VERIFY : Vérifie la commande.");
-                    Console.WriteLine("PRODUCE : Produit les robots.");
+                    HelpUserInstruction.Execute();
                     break;
 
-                case "STOCKS":
+                case StocksUserInstruction.CommandName:
                     if (!IsArgsEmpty(args))
                     {
-                        Logger.Log(LogType.ERROR, "La commande STOCKS ne prend pas d'arguments.");
+                        Logger.Log(LogType.ERROR, $"La commande {StocksUserInstruction.CommandName} ne prend pas d'arguments.");
                         return;
                     }
 
                     StocksUserInstruction.Execute();
                     break;
 
-                case "NEEDED_STOCKS":
-                    var neededStocksArgs = ValidateAndParseArgs(args, "NEEDED_STOCKS");
+                case NeededStocksUserInstruction.CommandName:
+                    var neededStocksArgs = ValidateAndParseArgs(args, NeededStocksUserInstruction.CommandName);
                     if (neededStocksArgs == null) return;
                     if (!VerifyRobots(neededStocksArgs)) return;
 
                     NeededStocksUserInstruction.Execute(neededStocksArgs);
                     break;
 
-                case "INSTRUCTIONS":
-                    var instructionsArgs = ValidateAndParseArgs(args, "INSTRUCTIONS");
+                case InstructionsUserInstruction.CommandName:
+                    var instructionsArgs = ValidateAndParseArgs(args, InstructionsUserInstruction.CommandName);
                     if (instructionsArgs == null) return;
                     if (!VerifyRobots(instructionsArgs)) return;
 
                     InstructionsUserInstruction.Execute(instructionsArgs);
                     break;
 
-                case "VERIFY":
-                    var verifyArgs = ValidateAndParseArgs(args, "VERIFY");
+                case VerifyUserInstruction.CommandName:
+                    var verifyArgs = ValidateAndParseArgs(args, VerifyUserInstruction.CommandName);
                     if (verifyArgs == null) return;
                     if (!VerifyRobots(verifyArgs)) return;
 
                     VerifyUserInstruction.Execute(verifyArgs);
                     break;
 
-                case "PRODUCE":
-                    var produceArgs = ValidateAndParseArgs(args, "PRODUCE");
+                case ProduceUserInstruction.CommandName:
+                    var produceArgs = ValidateAndParseArgs(args, ProduceUserInstruction.CommandName);
                     if (produceArgs == null) return;
                     if (!VerifyRobots(produceArgs)) return;
-                    
+
                     ProduceUserInstruction.Execute(produceArgs);
                     break;
 

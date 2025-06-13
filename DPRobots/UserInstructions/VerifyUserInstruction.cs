@@ -6,7 +6,9 @@ namespace DPRobots.UserInstructions;
 
 public record VerifyUserInstruction : IUserInstruction
 {
-    public override string ToString() => "VERIFY";
+    public const string CommandName = "VERIFY";
+
+    public override string ToString() => CommandName;
 
     public static void Execute(Dictionary<string, int> verifyArgs)
     {

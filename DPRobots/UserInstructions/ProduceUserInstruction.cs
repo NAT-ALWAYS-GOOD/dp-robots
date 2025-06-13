@@ -6,7 +6,9 @@ namespace DPRobots.UserInstructions;
 
 public record ProduceUserInstruction : IUserInstruction
 {
-    public override string ToString() => "PRODUCE";
+    public const string CommandName = "PRODUCE";
+
+    public override string ToString() => CommandName;
 
     public static void Execute(Dictionary<string, int> args)
     {

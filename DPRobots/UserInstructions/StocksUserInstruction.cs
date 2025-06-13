@@ -4,7 +4,9 @@ namespace DPRobots.UserInstructions;
 
 public record StocksUserInstruction : IUserInstruction
 {
-    public override string ToString() => "STOCKS";
+    public const string CommandName = "STOCKS";
+
+    public override string ToString() => CommandName;
 
     public static void Execute()
     {
