@@ -80,7 +80,9 @@ public class RobotBuilder(string name)
 
         var robot = new Robot(name, blueprint: _blueprint);
         var robotComponents = StockManager.GetRobotComponents(robot.Blueprint);
-        robot.Core = robotComponents.Core;
+        var core = robotComponents.Core;
+        core.InstallSystem(_blueprint.SystemPrototype);
+        robot.Core = core;
         robot.Generator = robotComponents.Generator;
         robot.GripModule = robotComponents.GripModule;
         robot.MoveModule = robotComponents.MoveModule;
