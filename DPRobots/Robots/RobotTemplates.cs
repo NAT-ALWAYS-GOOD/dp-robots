@@ -17,7 +17,7 @@ public class RobotTemplates
         return _instance = new RobotTemplates();
     }
 
-    private static void Add(RobotBlueprint template)
+    public static void Add(RobotBlueprint template)
     {
         if (!RobotBlueprintValidator.IsValid(template))
             Logger.Log(LogType.ERROR, $"Le template {template.Name} n'est pas valide");

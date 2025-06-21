@@ -19,6 +19,7 @@ public class CommandHandler
     /// INSTRUCTIONS ARGS
     /// VERIFY ARGS
     /// PRODUCE ARGS
+    /// ADD_TEMPLATE ARGS
     /// 
     /// </summary>
     /// <param name="commandLine"></param>
@@ -80,6 +81,10 @@ public class CommandHandler
                     if (!VerifyRobots(produceArgs)) return;
 
                     ProduceUserInstruction.Execute(produceArgs);
+                    break;
+                
+                case AddTemplateUserInstruction.CommandName:
+                    AddTemplateUserInstruction.Execute(args);
                     break;
 
                 default:
@@ -158,7 +163,7 @@ public class CommandHandler
     private static bool VerifyRobots(Dictionary<string, int> robotRequests)
     {
         var invalidRobot = robotRequests.Keys
-            .FirstOrDefault(robotName => Robot.FromName(robotName) == null);
+            .FirstOrDefault(robotName => RobotTemplates.Get(robotName) == null);
 
         if (invalidRobot == null) return true;
 

@@ -32,5 +32,7 @@ public record ProduceUserInstruction : IUserInstruction
                 StockManager.AddRobot(robot);
             }
         }
+        
+        Logger.Log(LogType.STOCK_UPDATED);
     }
 }
