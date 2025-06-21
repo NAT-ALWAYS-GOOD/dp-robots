@@ -1,4 +1,5 @@
 using DPRobots.Logging;
+using DPRobots.UserInstructions;
 
 namespace DPRobots.Pieces;
 
@@ -30,16 +31,41 @@ public static class PieceFactory
 
     public static Piece Create(string name)
     {
+        if (IsAssemblyName(name))
+        {
+            var partNames = UserInstructionArgumentParser.ParseAssemblyName(name);
+            var parts = partNames.Select(Create).ToList();
+            return new AssembledPiece(parts);
+        }
+
         if (DefaultPieces.TryGetValue(name, out var piece))
             return piece();
+
         Logger.Log(LogType.ERROR, $"No piece found with name '{name}'");
         throw new ArgumentException($"No piece named '{name}'");
     }
-    
+
     public static Piece? TryCreate(string name)
     {
-        if (DefaultPieces.TryGetValue(name, out var piece))
-            return piece();
-        return null;
+        if (IsAssemblyName(name))
+        {
+            try
+            {
+                var partNames = UserInstructionArgumentParser.ParseAssemblyName(name);
+                var parts = partNames.Select(TryCreate).ToList();
+                if (parts.Any(p => p == null)) return null;
+                return new AssembledPiece(parts!);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        return DefaultPieces.TryGetValue(name, out var piece) ? piece() : null;
     }
+
+
+    private static bool IsAssemblyName(string name) =>
+        name.StartsWith("[") && name.EndsWith("]");
 }

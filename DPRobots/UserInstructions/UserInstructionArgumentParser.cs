@@ -1,4 +1,4 @@
-using DPRobots.Logging;
+using System.Text;
 using DPRobots.Pieces;
 using DPRobots.Robots;
 using DPRobots.Stock;
@@ -29,7 +29,7 @@ public class UserInstructionArgumentParser
             if (!int.TryParse(tokens[0], out var quantity))
                 throw new ArgumentException($"La quantité '{tokens[0]}' n'est pas un nombre valide.");
 
-            var robotName = tokens[1].ToUpper();
+            var robotName = tokens[1];
             var invalidRobot = RobotTemplates.Get(robotName) == null;
             if (invalidRobot)
                 throw new ArgumentException($"Le robot '{robotName}' n'est pas reconnu.");
@@ -49,7 +49,7 @@ public class UserInstructionArgumentParser
             throw new ArgumentException("Format invalide. Attendu: TEMPLATE_NAME, Piece1, ..., PieceN");
         }
 
-        var name = parts[0].ToUpper();
+        var name = parts[0];
         var pieceNames = parts[1..];
 
         Core? core = null;
@@ -95,27 +95,81 @@ public class UserInstructionArgumentParser
     public static List<StockItem> ParseStockItems(string args)
     {
         var result = new List<StockItem>();
-        var parts = args.Split(',', StringSplitOptions.RemoveEmptyEntries);
-    
+        var parts = SplitTopLevel(args);
+
         foreach (var part in parts)
         {
             var trimmed = part.Trim();
-            var tokens = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            if (tokens.Length != 2)
+
+            int spaceIndex = IndexOfTopLevelSpace(trimmed);
+            if (spaceIndex == -1)
                 throw new ArgumentException($"Invalid format for argument '{trimmed}'. Expected: 'quantity name'.");
-    
-            if (!int.TryParse(tokens[0], out var quantity))
-                throw new ArgumentException($"Invalid quantity '{tokens[0]}'. Must be a valid number.");
-    
-            var name = tokens[1].ToUpper();
-            var maybePiece = PieceFactory.TryCreate(name);
-            var maybeRobot = Robot.FromName(name);
-            if (maybePiece == null && maybeRobot == null)
-                throw new ArgumentException($"No piece or robot found with name '{name}'.");
-    
-            if (maybeRobot != null) result.Add(new StockItem(maybeRobot, quantity));
+
+            var quantityPart = trimmed[..spaceIndex].Trim();
+            var namePart = trimmed[(spaceIndex + 1)..].Trim();
+
+            if (!int.TryParse(quantityPart, out var quantity))
+                throw new ArgumentException($"Invalid quantity '{quantityPart}'.");
+
+            var piece = PieceFactory.TryCreate(namePart);
+            var robot = Robot.FromName(namePart);
+
+            if (piece == null && robot == null)
+                throw new ArgumentException($"No piece or robot found with name '{namePart}'.");
+
+            if (robot != null) result.Add(new StockItem(robot, quantity));
+            if (piece != null) result.Add(new StockItem(piece, quantity));
         }
-    
+
         return result;
+    }
+
+
+    public static List<string> ParseAssemblyName(string name)
+    {
+        var inner = name.Substring(1, name.Length - 2);
+        return SplitTopLevel(inner).Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToList();
+    }
+    
+    private static List<string> SplitTopLevel(string input)
+    {
+        var result = new List<string>();
+        var current = new StringBuilder();
+        int depth = 0;
+
+        foreach (char c in input)
+        {
+            if (c == '[') depth++;
+            if (c == ']') depth--;
+
+            if (c == ',' && depth == 0)
+            {
+                result.Add(current.ToString());
+                current.Clear();
+            }
+            else
+            {
+                current.Append(c);
+            }
+        }
+
+        if (current.Length > 0)
+            result.Add(current.ToString());
+
+        return result;
+    }
+    
+    private static int IndexOfTopLevelSpace(string input)
+    {
+        int depth = 0;
+        for (int i = 0; i < input.Length; i++)
+        {
+            char c = input[i];
+            if (c == '[') depth++;
+            else if (c == ']') depth--;
+            else if (c == ' ' && depth == 0)
+                return i;
+        }
+        return -1;
     }
 }
