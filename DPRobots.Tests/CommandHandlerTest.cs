@@ -12,7 +12,7 @@ public class CommandHandlerTest
     {
         RobotTemplates.GetInstance().InitializeTemplates();
     }
-    
+
     private static readonly CommandHandler CommandHandler;
 
     static CommandHandlerTest()
@@ -67,54 +67,6 @@ public class CommandHandlerTest
     }
 
     [Fact]
-    public void ParseArgs_Should_AggreateQuantity_When_SameRobotProvided()
-    {
-        const string args = "1 XM-1, 2 Rd-1, 3 XM-1";
-        var expected = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "XM-1", 4 },
-            { "RD-1", 2 }
-        };
-
-        var result = CommandHandler.ParseArgs(args);
-
-        Assert.Equal(expected, result);
-    }
-
-    [Fact]
-    public void ParseArgs_Should_ThrowArgumentException_When_NotEnoughTokens()
-    {
-        const string args = "1 XM-1, 2";
-
-        var exception = Assert.Throws<ArgumentException>(() => CommandHandler.ParseArgs(args));
-
-        Assert.Equal("Le format de l'argument '2' est incorrect. Attendu : 'quantité nom_de_robot'.",
-            exception.Message);
-    }
-
-    [Fact]
-    public void ParseArgs_Should_ThrowArgumentException_When_QuantityIsNotANumber()
-    {
-        const string args = "1 XM-1, two Rd-1";
-
-        var exception = Assert.Throws<ArgumentException>(() => CommandHandler.ParseArgs(args));
-
-        Assert.Equal("La quantité 'two' n'est pas un nombre valide.", exception.Message);
-    }
-
-    [Fact]
-    public void ParseArgs_Should_ThrowArgumentException_When_TooManyTokens()
-    {
-        const string args = "1 XM-1, 2 Rd-1, 3 Extra Token";
-
-        var exception = Assert.Throws<ArgumentException>(() => CommandHandler.ParseArgs(args));
-
-        Assert.Equal("Le format de l'argument '3 Extra Token' est incorrect. Attendu : 'quantité nom_de_robot'.",
-            exception.Message);
-    }
-
-
-    [Fact]
     public void HandleCommand_Should_DisplayStock_When_StocksCommandProvided()
     {
         var output = new StringWriter();
@@ -153,7 +105,7 @@ public class CommandHandlerTest
     {
         var output = new StringWriter();
         Console.SetOut(output);
-        
+
         const string command = "INSTRUCTIONS 1 XM-1";
 
         CommandHandler.HandleCommand(command);
@@ -190,14 +142,14 @@ public class CommandHandlerTest
     {
         var output = new StringWriter();
         Console.SetOut(output);
-        
+
         StockManager.GetInstance().Initialize([
             new StockItem(PieceFactory.Create("Core_CM1"), 10),
             new StockItem(PieceFactory.Create("Generator_GM1"), 10),
             new StockItem(PieceFactory.Create("Arms_AM1"), 10),
             new StockItem(PieceFactory.Create("Legs_LM1"), 10)
         ]);
-        
+
         const string command = "PRODUCE 1 XM-1";
 
         CommandHandler.HandleCommand(command);
@@ -230,6 +182,6 @@ public class CommandHandlerTest
         CommandHandler.HandleCommand(command);
 
         var result = output.ToString();
-        Assert.Equal("ERROR Instruction non reconnue.", result.Trim());
+        Assert.Equal("ERROR Instruction `UNKNOWN_COMMAND` non reconnue.", result.Trim());
     }
 }

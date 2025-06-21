@@ -11,15 +11,10 @@ public record RobotBlueprint(
     MoveModule MoveModulePrototype
 )
 {
-    public RobotCategory? InferredCategory
-    {
-        get
-        {
-            return RobotBlueprintValidator.TryInferCategory(this, out var category)
-                ? category
-                : null;
-        }
-    }
+    public RobotCategory? InferredCategory =>
+        RobotBlueprintValidator.TryInferCategory(this, out var category)
+            ? category
+            : null;
 
     public bool IsValid => InferredCategory != null;
 }

@@ -4,15 +4,32 @@ using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
-public record ProduceUserInstruction : IUserInstruction
+public record ProduceUserInstruction(Dictionary<string, int> RobotsWithQuantities) : IUserInstruction
 {
     public const string CommandName = "PRODUCE";
 
     public override string ToString() => CommandName;
 
-    public static void Execute(Dictionary<string, int> args)
+    public static IUserInstruction? TryParse(string args)
     {
-        var request = args
+        if (string.IsNullOrWhiteSpace(args))
+            return null;
+
+        try
+        {
+            var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(args);
+            return new ProduceUserInstruction(robotsWithQuantities);
+        }
+        catch (Exception e)
+        {
+            Logger.Log(LogType.ERROR, e.Message);
+            return null;
+        }
+    }
+    
+    public void Execute()
+    {
+        var request = RobotsWithQuantities
             .ToDictionary(kvp => Robot.FromName(kvp.Key)!, kvp => kvp.Value);
 
         if (!StockManager.VerifyRequestedQuantitiesAreAvailable(request))

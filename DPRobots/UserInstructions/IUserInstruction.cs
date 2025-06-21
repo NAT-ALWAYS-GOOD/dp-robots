@@ -4,7 +4,7 @@ public interface IUserInstruction
 {
     string ToString();
     
-    public static void Execute()
+    public void Execute()
     {
     }
 }

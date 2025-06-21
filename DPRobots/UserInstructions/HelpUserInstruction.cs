@@ -1,3 +1,5 @@
+using DPRobots.Logging;
+
 namespace DPRobots.UserInstructions;
 
 public record HelpUserInstruction : IUserInstruction
@@ -6,7 +8,21 @@ public record HelpUserInstruction : IUserInstruction
 
     public override string ToString() => CommandName;
 
-    public static void Execute()
+    public static IUserInstruction? TryParse(string args)
+    {
+        try
+        {
+            UserInstructionArgumentParser.EnsureEmpty(args, CommandName);
+            return new HelpUserInstruction();
+        }
+        catch (Exception e)
+        {
+            Logger.Log(LogType.ERROR, e.Message);
+            return null;
+        }
+    }
+    
+    public void Execute()
     {
         Console.WriteLine("Liste des commandes disponibles :");
         Console.WriteLine("HELP : Affiche cette aide.");
