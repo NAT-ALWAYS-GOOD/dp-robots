@@ -8,7 +8,8 @@ public record RobotBlueprint(
     System SystemPrototype,
     Generator GeneratorPrototype,
     GripModule GripModulePrototype,
-    MoveModule MoveModulePrototype
+    MoveModule MoveModulePrototype,
+    List<Piece>? AdditionalModules = null
 )
 {
     public PieceCategory? InferredCategory =>

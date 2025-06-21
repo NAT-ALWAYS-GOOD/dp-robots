@@ -19,10 +19,31 @@ public static class RobotBlueprintValidator
         [PieceCategory.Military] = [PieceCategory.Military, PieceCategory.General],
         [PieceCategory.General] = []
     };
+    
+    private static readonly Dictionary<PieceCategory, int> MaxAdditionalModules = new()
+    {
+        [PieceCategory.Domestic] = 1,
+        [PieceCategory.Industrial] = 3,
+        [PieceCategory.Military] = 2,
+        [PieceCategory.General] = 0
+    };
+    
+    public static bool AreAdditionalModulesValid(RobotBlueprint blueprint)
+    {
+        var category = blueprint.InferredCategory;
+        if (category == null)
+        {
+            return false;
+        }
+
+        var additionalModulesCount = blueprint.AdditionalModules?.Count ?? 0;
+
+        return additionalModulesCount <= MaxAdditionalModules[category.Value];
+    }
 
     public static bool IsValid(RobotBlueprint blueprint)
     {
-        return TryInferCategory(blueprint, out _);
+        return TryInferCategory(blueprint, out _) && AreAdditionalModulesValid(blueprint);
     }
 
     public static bool TryInferCategory(RobotBlueprint blueprint, out PieceCategory category)
