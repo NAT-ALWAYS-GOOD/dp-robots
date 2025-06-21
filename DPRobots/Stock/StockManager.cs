@@ -1,4 +1,3 @@
-using DPRobots.Logging;
 using DPRobots.Pieces;
 using DPRobots.Robots;
 
@@ -6,9 +5,7 @@ namespace DPRobots.Stock;
 
 public class StockManager
 {
-    private static List<StockItem> _stocks = new();
-
-    private static readonly List<RobotStockItem> RobotStocks = new();
+    private static List<StockItem> _stock = new();
 
     private static StockManager? _instance;
 
@@ -22,13 +19,13 @@ public class StockManager
 
     public void Initialize(List<StockItem> initialStock)
     {
-        _stocks = initialStock;
+        _stock = initialStock;
         _instance = this;
     }
 
     public static T RemovePiece<T>(Piece piece) where T : Piece
     {
-        var stockItem = _stocks.Find(item => item.Prototype.Equals(piece));
+        var stockItem = _stock.Find(item => item.Prototype.Equals(piece));
         if (stockItem == null)
             throw new InvalidOperationException($"No stock item found for piece: {piece}");
 
@@ -36,16 +33,29 @@ public class StockManager
 
         return (T)stockItem.Prototype.Clone();
     }
+    
+    public void AddStockItem(StockItem item)
+    {
+        var existingItem = _stock.Find(stock => stock.Prototype.Equals(item.Prototype));
+        if (existingItem != null)
+        {
+            existingItem.IncreaseQuantity(item.Quantity);
+        }
+        else
+        {
+            _stock.Add(item);
+        }
+    }
 
     public static void AddRobot(Robot? robot)
     {
         if (robot == null) return;
         
-        var robotStockItem = RobotStocks.Find(item => item.RobotPrototype == robot);
+        var robotStockItem = _stock.Find(item => item.Prototype.Equals(robot));
         if (robotStockItem != null)
             robotStockItem.IncreaseQuantity(1);
         else
-            RobotStocks.Add(new RobotStockItem(robot, 1));
+            _stock.Add(new StockItem(robot, 1));
     }
 
     public static RobotComponents GetRobotComponents(RobotBlueprint blueprint, bool simulate = false)
@@ -105,7 +115,7 @@ public class StockManager
 
         foreach (var pieceWithQuantity in overallTotals)
         {
-            var available = _stocks.Where(stockItem => stockItem.Prototype.Equals(pieceWithQuantity.Key))
+            var available = _stock.Where(stockItem => stockItem.Prototype.Equals(pieceWithQuantity.Key))
                 .Sum(stockItem => stockItem.Quantity);
             if (available >= pieceWithQuantity.Value)
                 continue;
@@ -116,6 +126,5 @@ public class StockManager
         return true;
     }
 
-    public IReadOnlyList<StockItem> GetPieceStocks => _stocks;
-    public IReadOnlyList<RobotStockItem> GetRobotStocks => RobotStocks;
+    public IReadOnlyList<StockItem> GetStock => _stock;
 }

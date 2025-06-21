@@ -1,5 +1,4 @@
 using DPRobots.Logging;
-using DPRobots.Robots;
 using DPRobots.UserInstructions;
 
 namespace DPRobots;
@@ -14,7 +13,8 @@ public class CommandHandler
         [InstructionsUserInstruction.CommandName] = InstructionsUserInstruction.TryParse,
         [VerifyUserInstruction.CommandName] = VerifyUserInstruction.TryParse,
         [ProduceUserInstruction.CommandName] = ProduceUserInstruction.TryParse,
-        [AddTemplateUserInstruction.CommandName] = AddTemplateUserInstruction.TryParse
+        [AddTemplateUserInstruction.CommandName] = AddTemplateUserInstruction.TryParse,
+        [ReceiveUserInstruction.CommandName] = ReceiveUserInstruction.TryParse
     };
 
     

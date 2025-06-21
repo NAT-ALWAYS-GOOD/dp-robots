@@ -25,10 +25,10 @@ public record StocksUserInstruction : IUserInstruction
     public void Execute()
     {
         var stockManager = StockManager.GetInstance();
-        var pieceStock = stockManager.GetPieceStocks;
-        var robotStock = stockManager.GetRobotStocks;
+        var pieceStock = stockManager.GetStock;
+        var robotStock = stockManager.GetStock;
         foreach (var stockItem in robotStock)
-            Console.WriteLine($"{stockItem.Quantity} {stockItem.RobotPrototype}");
+            Console.WriteLine($"{stockItem.Quantity} {stockItem.Prototype}");
 
         foreach (var stockItem in pieceStock)
             Console.WriteLine($"{stockItem.Quantity} {stockItem.Prototype}");

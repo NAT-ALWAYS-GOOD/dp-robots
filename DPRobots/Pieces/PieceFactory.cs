@@ -35,4 +35,11 @@ public static class PieceFactory
         Logger.Log(LogType.ERROR, $"No piece found with name '{name}'");
         throw new ArgumentException($"No piece named '{name}'");
     }
+    
+    public static Piece? TryCreate(string name)
+    {
+        if (DefaultPieces.TryGetValue(name, out var piece))
+            return piece();
+        return null;
+    }
 }

@@ -1,6 +1,7 @@
 using DPRobots.Logging;
 using DPRobots.Pieces;
 using DPRobots.Robots;
+using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
@@ -89,5 +90,32 @@ public class UserInstructionArgumentParser
         }
 
         return new RobotBlueprint(name, core, system, generator, grip, move);
+    }
+    
+    public static List<StockItem> ParseStockItems(string args)
+    {
+        var result = new List<StockItem>();
+        var parts = args.Split(',', StringSplitOptions.RemoveEmptyEntries);
+    
+        foreach (var part in parts)
+        {
+            var trimmed = part.Trim();
+            var tokens = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length != 2)
+                throw new ArgumentException($"Invalid format for argument '{trimmed}'. Expected: 'quantity name'.");
+    
+            if (!int.TryParse(tokens[0], out var quantity))
+                throw new ArgumentException($"Invalid quantity '{tokens[0]}'. Must be a valid number.");
+    
+            var name = tokens[1].ToUpper();
+            var maybePiece = PieceFactory.TryCreate(name);
+            var maybeRobot = Robot.FromName(name);
+            if (maybePiece == null && maybeRobot == null)
+                throw new ArgumentException($"No piece or robot found with name '{name}'.");
+    
+            if (maybeRobot != null) result.Add(new StockItem(maybeRobot, quantity));
+        }
+    
+        return result;
     }
 }

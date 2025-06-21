@@ -11,10 +11,10 @@ public record RobotBlueprint(
     MoveModule MoveModulePrototype
 )
 {
-    public RobotCategory? InferredCategory =>
+    public PieceCategory? InferredCategory =>
         RobotBlueprintValidator.TryInferCategory(this, out var category)
             ? category
             : null;
 
-    public bool IsValid => InferredCategory != null;
+    public bool IsValid => InferredCategory != null && InferredCategory != PieceCategory.General;
 }

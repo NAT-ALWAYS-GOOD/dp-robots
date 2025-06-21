@@ -4,18 +4,20 @@ namespace DPRobots.Robots;
 
 public static class RobotBlueprintValidator
 {
-    private static readonly Dictionary<RobotCategory, HashSet<PieceCategory>> AllowedPieceCategories = new()
+    private static readonly Dictionary<PieceCategory, HashSet<PieceCategory>> AllowedPieceCategories = new()
     {
-        [RobotCategory.Domestic] = [PieceCategory.Domestic, PieceCategory.General, PieceCategory.Industrial],
-        [RobotCategory.Industrial] = [PieceCategory.General, PieceCategory.Industrial],
-        [RobotCategory.Military] = [PieceCategory.Military, PieceCategory.Industrial]
+        [PieceCategory.Domestic] = [PieceCategory.Domestic, PieceCategory.General, PieceCategory.Industrial],
+        [PieceCategory.Industrial] = [PieceCategory.General, PieceCategory.Industrial],
+        [PieceCategory.Military] = [PieceCategory.Military, PieceCategory.Industrial],
+        [PieceCategory.General] = []
     };
 
-    private static readonly Dictionary<RobotCategory, HashSet<PieceCategory>> AllowedSystemCategories = new()
+    private static readonly Dictionary<PieceCategory, HashSet<PieceCategory>> AllowedSystemCategories = new()
     {
-        [RobotCategory.Domestic] = [PieceCategory.Domestic, PieceCategory.General, PieceCategory.Industrial],
-        [RobotCategory.Industrial] = [PieceCategory.General, PieceCategory.Industrial],
-        [RobotCategory.Military] = [PieceCategory.Military, PieceCategory.General]
+        [PieceCategory.Domestic] = [PieceCategory.Domestic, PieceCategory.General, PieceCategory.Industrial],
+        [PieceCategory.Industrial] = [PieceCategory.General, PieceCategory.Industrial],
+        [PieceCategory.Military] = [PieceCategory.Military, PieceCategory.General],
+        [PieceCategory.General] = []
     };
 
     public static bool IsValid(RobotBlueprint blueprint)
@@ -23,7 +25,7 @@ public static class RobotBlueprintValidator
         return TryInferCategory(blueprint, out _);
     }
 
-    public static bool TryInferCategory(RobotBlueprint blueprint, out RobotCategory category)
+    public static bool TryInferCategory(RobotBlueprint blueprint, out PieceCategory category)
     {
         var pieceCategories = new[]
         {
@@ -35,7 +37,7 @@ public static class RobotBlueprintValidator
 
         var systemCategory = blueprint.SystemPrototype.Category;
 
-        foreach (var cat in Enum.GetValues<RobotCategory>())
+        foreach (var cat in Enum.GetValues<PieceCategory>())
         {
             var allowedPieces = AllowedPieceCategories[cat];
             var allowedSystems = AllowedSystemCategories[cat];

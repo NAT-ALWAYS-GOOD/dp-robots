@@ -57,8 +57,8 @@ public class StockManagerTests
 
         StockManager.AddRobot(robot);
 
-        Assert.True(StockManager.GetInstance().GetRobotStocks.SingleOrDefault(item => item.RobotPrototype == robot) != null);
-        Assert.Equal(1, StockManager.GetInstance().GetRobotStocks.Where(item => item.RobotPrototype == robot).First().Quantity);
+        Assert.True(StockManager.GetInstance().GetStock.SingleOrDefault(item => item.Prototype.Equals(robot)) != null);
+        Assert.Equal(1, StockManager.GetInstance().GetStock.Where(item => item.Prototype.Equals(robot)).First().Quantity);
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class StockManagerTests
         StockManager.AddRobot(robot);
 
         Assert.NotNull(robot);
-        Assert.True(StockManager.GetInstance().GetRobotStocks.SingleOrDefault(item => item.RobotPrototype == robot) != null);
-        Assert.Equal(2, StockManager.GetInstance().GetRobotStocks.Where(item => item.RobotPrototype == robot).First().Quantity);
+        Assert.True(StockManager.GetInstance().GetStock.SingleOrDefault(item => item.Prototype.Equals(robot)) != null);
+        Assert.Equal(2, StockManager.GetInstance().GetStock.Where(item => item.Prototype.Equals(robot)).First().Quantity);
     }
 }

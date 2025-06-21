@@ -168,7 +168,7 @@ public class CommandHandlerTest
 
         // verify stock
         Assert.Equal(1,
-            StockManager.GetInstance().GetRobotStocks.Where(item => item.RobotPrototype.ToString() == "XM-1")
+            StockManager.GetInstance().GetStock.Where(item => item.Prototype.ToString() == "XM-1")
                 .FirstOrDefault()?.Quantity);
     }
 
