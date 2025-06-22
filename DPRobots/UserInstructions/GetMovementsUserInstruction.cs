@@ -1,9 +1,10 @@
 using DPRobots.Logging;
+using DPRobots.RobotFactories;
 using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
-public record GetMovementsUserInstruction(List<string>? Pieces = null) : IUserInstruction
+public record GetMovementsUserInstruction(RobotFactory Factory, List<string>? Pieces = null) : IUserInstruction
 {
     public const string CommandName = "GET_MOVEMENTS";
 
@@ -13,14 +14,22 @@ public record GetMovementsUserInstruction(List<string>? Pieces = null) : IUserIn
 
     public static IUserInstruction? TryParse(string args)
     {
+        var (piecesArgs, factory) = UserInstructionArgumentParser.SplitArgsAndFactory(args);
+        if (factory is null)
+        {
+            Logger.Log(LogType.ERROR,
+                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.Factories.Select(f => f.Name))}.");
+            return null;
+        }
+        
         if (string.IsNullOrWhiteSpace(args))
-            return new GetMovementsUserInstruction();
+            return new GetMovementsUserInstruction(factory);
 
         try
         {
-            var pieceNames = UserInstructionArgumentParser.ParsePieceNames(args);
+            var pieceNames = UserInstructionArgumentParser.ParsePieceNames(piecesArgs);
             GivenArgs = args;
-            return new GetMovementsUserInstruction(pieceNames);
+            return new GetMovementsUserInstruction(factory, pieceNames);
         }
         catch (Exception e)
         {
@@ -35,13 +44,13 @@ public record GetMovementsUserInstruction(List<string>? Pieces = null) : IUserIn
 
         if (Pieces == null || Pieces.Count == 0)
         {
-            movementsToDisplay.AddRange(StockManager.GetMovements());
+            movementsToDisplay.AddRange(Factory.Stock.GetMovements());
         }
         else
         {
             foreach (var piece in Pieces)
             {
-                movementsToDisplay.AddRange(StockManager.GetMovements(piece));
+                movementsToDisplay.AddRange(Factory.Stock.GetMovements(piece));
             }
         }
 

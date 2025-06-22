@@ -1,10 +1,12 @@
 using DPRobots.Logging;
+using DPRobots.RobotFactories;
 using DPRobots.Robots;
 using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
-public record ProduceUserInstruction(Dictionary<string, int> RobotsWithQuantities) : IUserInstruction
+public record ProduceUserInstruction(Dictionary<RobotBlueprint, int> RobotsWithQuantities, RobotFactory Factory)
+    : IUserInstruction
 {
     public const string CommandName = "PRODUCE";
 
@@ -17,11 +19,29 @@ public record ProduceUserInstruction(Dictionary<string, int> RobotsWithQuantitie
         if (string.IsNullOrWhiteSpace(args))
             return null;
 
+        var (robotArgs, factory) = UserInstructionArgumentParser.SplitArgsAndFactory(args);
+
         try
         {
-            var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(args);
+            var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(robotArgs);
+            var availableFactories =
+                FactoryManager.GetInstance().FindFactoriesWithAvailableStock(robotsWithQuantities);
+            if (factory is null)
+            {
+                Logger.Log(LogType.ERROR,
+                    $"Missing target factory. Available factories for this instruction are {string.Join(", ", availableFactories.Select(f => f.Name))}.");
+                return null;
+            }
+            
+            if (!availableFactories.Contains(factory))
+            {
+                Logger.Log(LogType.ERROR,
+                    $"Factory `{factory.Name}` is not available for the requested robots. Available factories are {string.Join(", ", availableFactories.Select(f => f.Name))}.");
+                return null;
+            }
+
             GivenArgs = args;
-            return new ProduceUserInstruction(robotsWithQuantities);
+            return new ProduceUserInstruction(robotsWithQuantities, factory);
         }
         catch (Exception e)
         {
@@ -29,30 +49,21 @@ public record ProduceUserInstruction(Dictionary<string, int> RobotsWithQuantitie
             return null;
         }
     }
-    
+
     public void Execute()
     {
-        var request = RobotsWithQuantities
-            .ToDictionary(kvp => Robot.FromName(kvp.Key)!, kvp => kvp.Value);
-
-        if (!StockManager.VerifyRequestedQuantitiesAreAvailable(request))
-        {
-            Logger.Log(LogType.ERROR, "Impossible de produire les robots, pas assez de pièces.");
-            return;
-        }
-
-        foreach (var (robotToBuild, count) in request)
+        foreach (var (robotToBuild, count) in RobotsWithQuantities)
         {
             for (var i = 0; i < count; i++)
             {
-                var robot = new RobotBuilder(robotToBuild.ToString())
+                var robot = new RobotBuilder(robotToBuild.Name, Factory)
                     .UseTemplate()
                     .GenerateInstructions()
                     .Build(true, ToString());
-                StockManager.AddRobot(robot, ToString());
+                Factory.Stock.AddRobot(robot, ToString());
             }
         }
-        
+
         Logger.Log(LogType.STOCK_UPDATED);
     }
 }

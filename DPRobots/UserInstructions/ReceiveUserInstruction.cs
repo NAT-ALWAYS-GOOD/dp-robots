@@ -1,9 +1,10 @@
 using DPRobots.Logging;
+using DPRobots.RobotFactories;
 using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
-public record ReceiveUserInstruction(List<StockItem> ItemsToAdd) : IUserInstruction
+public record ReceiveUserInstruction(List<StockItem> ItemsToAdd, RobotFactory Factory) : IUserInstruction
 {
     public const string CommandName = "RECEIVE";
 
@@ -15,12 +16,20 @@ public record ReceiveUserInstruction(List<StockItem> ItemsToAdd) : IUserInstruct
     {
         if (string.IsNullOrWhiteSpace(args))
             return null;
+        
+        var (stockArgs, factory) = UserInstructionArgumentParser.SplitArgsAndFactory(args);
+        if (factory is null)
+        {
+            Logger.Log(LogType.ERROR,
+                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.Factories.Select(f => f.Name))}.");
+            return null;
+        }
 
         try
         {
-            var itemsToAdd = UserInstructionArgumentParser.ParseStockItems(args);
+            var itemsToAdd = UserInstructionArgumentParser.ParseStockItems(stockArgs);
             GivenArgs = args;
-            return new ReceiveUserInstruction(itemsToAdd);
+            return new ReceiveUserInstruction(itemsToAdd, factory);
         }
         catch (Exception e)
         {
@@ -33,7 +42,7 @@ public record ReceiveUserInstruction(List<StockItem> ItemsToAdd) : IUserInstruct
     {
         foreach (var item in ItemsToAdd)
         {
-            StockManager.GetInstance().AddStockItem(item);
+            Factory.Stock.AddStockItem(item);
         }
         Logger.Log(LogType.STOCK_UPDATED);
     }

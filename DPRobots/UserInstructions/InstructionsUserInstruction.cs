@@ -4,7 +4,7 @@ using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
-public record InstructionsUserInstruction(Dictionary<string, int> RobotsWithQuantities) : IUserInstruction
+public record InstructionsUserInstruction(Dictionary<RobotBlueprint, int> RobotsWithQuantities) : IUserInstruction
 {
     public const string CommandName = "INSTRUCTIONS";
 
@@ -32,11 +32,11 @@ public record InstructionsUserInstruction(Dictionary<string, int> RobotsWithQuan
 
     public void Execute()
     {
-        foreach (var (robotName, count) in RobotsWithQuantities)
+        foreach (var (blueprint, count) in RobotsWithQuantities)
         {
             for (var i = 0; i < count; i++)
             {
-                new RobotBuilder(robotName)
+                new RobotBuilder(blueprint.Name)
                     .UseTemplate()
                     .GenerateInstructions()
                     .Simulate();

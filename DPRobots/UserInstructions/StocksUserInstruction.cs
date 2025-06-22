@@ -1,20 +1,23 @@
 using DPRobots.Logging;
+using DPRobots.RobotFactories;
 using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
-public record StocksUserInstruction : IUserInstruction
+public record StocksUserInstruction(RobotFactory? Factory = null) : IUserInstruction
 {
     public const string CommandName = "STOCKS";
 
     public override string ToString() => CommandName;
-    
+
     public static IUserInstruction? TryParse(string args)
     {
+        var (stockArgs, factory) = UserInstructionArgumentParser.SplitArgsAndFactory(args);
+
         try
         {
-            UserInstructionArgumentParser.EnsureEmpty(args, CommandName);
-            return new StocksUserInstruction();
+            UserInstructionArgumentParser.EnsureEmpty(stockArgs, CommandName);
+            return new StocksUserInstruction(factory);
         }
         catch (Exception e)
         {
@@ -22,15 +25,14 @@ public record StocksUserInstruction : IUserInstruction
             return null;
         }
     }
+
     public void Execute()
     {
-        var stockManager = StockManager.GetInstance();
-        var pieceStock = stockManager.GetStock;
-        var robotStock = stockManager.GetStock;
-        foreach (var stockItem in robotStock)
-            Console.WriteLine($"{stockItem.Quantity} {stockItem.Prototype}");
+        IReadOnlyList<StockItem> stock;
+        if (Factory is null) stock = FactoryManager.GetInstance().GetTotalStockItems();
+        else stock = Factory.Stock.GetStock;
 
-        foreach (var stockItem in pieceStock)
+        foreach (var stockItem in stock)
             Console.WriteLine($"{stockItem.Quantity} {stockItem.Prototype}");
     }
 }

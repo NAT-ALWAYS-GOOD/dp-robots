@@ -50,17 +50,6 @@ public class Robot : Piece
 
         return robot;
     }
-    
-    public List<Piece> GetNeededPieces()
-    {
-        return
-        [
-            Blueprint.CorePrototype,
-            Blueprint.GeneratorPrototype,
-            Blueprint.GripModulePrototype,
-            Blueprint.MoveModulePrototype
-        ];
-    }
 
     public override object Clone()
     {

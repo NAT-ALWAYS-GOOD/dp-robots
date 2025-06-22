@@ -5,19 +5,9 @@ namespace DPRobots.Stock;
 
 public class StockManager
 {
-    private static List<StockItem> _stock = new();
+    private List<StockItem> _stock = new();
 
-    private static readonly List<StockMovement> _movements = new();
-
-    private static StockManager? _instance;
-
-    public static StockManager GetInstance()
-    {
-        if (_instance != null)
-            return _instance;
-
-        return _instance = new StockManager();
-    }
+    private readonly List<StockMovement> _movements = new();
 
     public void Initialize(List<StockItem> initialStock)
     {
@@ -25,10 +15,9 @@ public class StockManager
         {
             AddStockItem(item, "Initialization");
         }
-        _instance = this;
     }
 
-    public static T RemovePiece<T>(Piece piece, string? context = null) where T : Piece
+    public T RemovePiece<T>(Piece piece, string? context = null) where T : Piece
     {
         var stockItem = _stock.Find(item => item.Prototype.Equals(piece));
         if (stockItem == null)
@@ -55,7 +44,7 @@ public class StockManager
         LogMovement(StockOperation.Add, item.Prototype.ToString(), 1, context);
     }
 
-    public static void AddRobot(Robot? robot, string? context = null)
+    public void AddRobot(Robot? robot, string? context = null)
     {
         if (robot == null) return;
 
@@ -68,7 +57,7 @@ public class StockManager
         LogMovement(StockOperation.Add, robot.ToString(), 1, context);
     }
 
-    public static RobotComponents GetRobotComponents(RobotBlueprint blueprint, bool simulate = false, string? context = null)
+    public RobotComponents GetRobotComponents(RobotBlueprint blueprint, bool simulate = false, string? context = null)
     {
         switch (simulate)
         {
@@ -85,7 +74,7 @@ public class StockManager
         }
     }
 
-    public static Dictionary<Piece, int> CalculateOverallNeededStocks(Dictionary<Robot, int> robotRequests,
+    public static Dictionary<Piece, int> CalculateOverallNeededStocks(Dictionary<RobotBlueprint, int> robotRequests,
         bool printDetails = false)
     {
         var overallTotals = new Dictionary<Piece, int>();
@@ -96,13 +85,13 @@ public class StockManager
                 overallTotals[piece] += quantity;
         }
 
-        foreach (var (robot, count) in robotRequests)
+        foreach (var (blueprint, count) in robotRequests)
         {
-            List<Piece> neededPieces = robot.GetNeededPieces();
+            List<Piece> neededPieces = blueprint.GetNeededPieces();
 
             if (printDetails)
             {
-                Console.WriteLine($"{count} {robot} :");
+                Console.WriteLine($"{count} {blueprint} :");
                 foreach (var piece in neededPieces)
                 {
                     Console.WriteLine($"    {count} {piece}");
@@ -118,7 +107,7 @@ public class StockManager
         return overallTotals;
     }
 
-    public static bool VerifyRequestedQuantitiesAreAvailable(Dictionary<Robot, int> requestedRobotsWithQuantities)
+    public bool VerifyRequestedQuantitiesAreAvailable(Dictionary<RobotBlueprint, int> requestedRobotsWithQuantities)
     {
         var overallTotals = CalculateOverallNeededStocks(requestedRobotsWithQuantities);
 
@@ -135,12 +124,12 @@ public class StockManager
         return true;
     }
 
-    public static void LogMovement(StockOperation operation, string itemName, int quantity, string? context = null)
+    public void LogMovement(StockOperation operation, string itemName, int quantity, string? context = null)
     {
         _movements.Add(new StockMovement(operation, itemName, quantity, context));
     }
 
-    public static IEnumerable<StockMovement> GetMovements(string? filter = null)
+    public IEnumerable<StockMovement> GetMovements(string? filter = null)
     {
         return filter == null
             ? _movements

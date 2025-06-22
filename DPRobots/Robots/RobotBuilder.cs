@@ -1,17 +1,22 @@
 using DPRobots.Instructions;
 using DPRobots.Logging;
 using DPRobots.Pieces;
-using DPRobots.Stock;
+using DPRobots.RobotFactories;
 
 namespace DPRobots.Robots;
 
-public class RobotBuilder(string name)
+public class RobotBuilder(string name, RobotFactory? factory = null)
 {
     private RobotBlueprint? _blueprint;
     private List<IInstruction> _instructions = [];
 
-    public RobotBuilder UseTemplate()
+    public RobotBuilder UseTemplate(RobotBlueprint? blueprint = null)
     {
+        if (blueprint is not null)
+        {
+            _blueprint = blueprint;
+            return this;
+        }
         _blueprint = RobotTemplates.Get(name);
         if (_blueprint is null) Logger.Log(LogType.ERROR, $"`{name}` is not a recognized robot");
         return this;
@@ -72,6 +77,8 @@ public class RobotBuilder(string name)
     {
         if (_blueprint is null)
             throw new InvalidOperationException("Template must be provided before building.");
+        if (factory is null)
+            throw new InvalidOperationException("Factory must be provided before building.");
 
         if (printInstructions == true)
         {
@@ -79,7 +86,7 @@ public class RobotBuilder(string name)
         }
 
         var robot = new Robot(name, blueprint: _blueprint);
-        var robotComponents = StockManager.GetRobotComponents(robot.Blueprint, false, context);
+        var robotComponents = factory.Stock.GetRobotComponents(robot.Blueprint, false, context);
         var core = robotComponents.Core;
         core.InstallSystem(_blueprint.SystemPrototype);
         robot.Core = core;

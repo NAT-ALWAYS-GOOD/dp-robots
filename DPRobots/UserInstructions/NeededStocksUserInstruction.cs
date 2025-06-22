@@ -4,7 +4,7 @@ using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
-public record NeededStocksUserInstruction(Dictionary<string, int> RobotsWithQuantities) : IUserInstruction
+public record NeededStocksUserInstruction(Dictionary<RobotBlueprint, int> RobotsWithQuantities) : IUserInstruction
 {
     public const string CommandName = "NEEDED_STOCKS";
 
@@ -32,9 +32,7 @@ public record NeededStocksUserInstruction(Dictionary<string, int> RobotsWithQuan
 
     public void Execute()
     {
-        var request = RobotsWithQuantities
-            .ToDictionary(kvp => Robot.FromName(kvp.Key)!, kvp => kvp.Value);
-        var overallTotals = StockManager.CalculateOverallNeededStocks(request, true);
+        var overallTotals = StockManager.CalculateOverallNeededStocks(RobotsWithQuantities, true);
 
         if (overallTotals.Count == 0) return;
 

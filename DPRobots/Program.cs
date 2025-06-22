@@ -2,6 +2,7 @@
 using DPRobots.Robots;
 using DPRobots.Stock;
 using DPRobots.Pieces;
+using DPRobots.RobotFactories;
 
 namespace DPRobots;
 
@@ -27,8 +28,10 @@ public class Program
             new(new MoveModule(MoveModuleNames.Ld1, PieceCategory.Domestic), 5),
             new(new MoveModule(MoveModuleNames.Li1, PieceCategory.Industrial), 5)
         ];
-        var stockManager = StockManager.GetInstance();
-        stockManager.Initialize(stock);
+        
+        var factoryManager = FactoryManager.GetInstance();
+        factoryManager.RegisterFactory(new RobotFactory("Usine1", stock));
+        factoryManager.RegisterFactory(new RobotFactory("Usine2"));
 
         Console.WriteLine("Tapez votre commande ou 'EXIT' pour quitter.");
 

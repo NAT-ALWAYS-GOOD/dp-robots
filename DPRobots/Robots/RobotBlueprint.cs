@@ -16,6 +16,17 @@ public record RobotBlueprint(
         RobotBlueprintValidator.TryInferCategory(this, out var category)
             ? category
             : null;
+    
+    public List<Piece> GetNeededPieces()
+    {
+        return
+        [
+            CorePrototype,
+            GeneratorPrototype,
+            GripModulePrototype,
+            MoveModulePrototype
+        ];
+    }
 
     public bool IsValid => InferredCategory != null && InferredCategory != PieceCategory.General;
 }

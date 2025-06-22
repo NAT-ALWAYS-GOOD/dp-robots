@@ -5,20 +5,21 @@ namespace DPRobots;
 
 public class CommandHandler
 {
-    private static readonly Dictionary<string, Func<string, IUserInstruction?>> RegisteredInstructions = new(StringComparer.OrdinalIgnoreCase)
-    {
-        [HelpUserInstruction.CommandName] = HelpUserInstruction.TryParse,
-        [StocksUserInstruction.CommandName] = StocksUserInstruction.TryParse,
-        [NeededStocksUserInstruction.CommandName] = NeededStocksUserInstruction.TryParse,
-        [InstructionsUserInstruction.CommandName] = InstructionsUserInstruction.TryParse,
-        [VerifyUserInstruction.CommandName] = VerifyUserInstruction.TryParse,
-        [ProduceUserInstruction.CommandName] = ProduceUserInstruction.TryParse,
-        [AddTemplateUserInstruction.CommandName] = AddTemplateUserInstruction.TryParse,
-        [ReceiveUserInstruction.CommandName] = ReceiveUserInstruction.TryParse,
-        [GetMovementsUserInstruction.CommandName] = GetMovementsUserInstruction.TryParse,
-    };
+    private static readonly Dictionary<string, Func<string, IUserInstruction?>> RegisteredInstructions =
+        new(StringComparer.OrdinalIgnoreCase)
+        {
+            [HelpUserInstruction.CommandName] = HelpUserInstruction.TryParse,
+            [StocksUserInstruction.CommandName] = StocksUserInstruction.TryParse,
+            [NeededStocksUserInstruction.CommandName] = NeededStocksUserInstruction.TryParse,
+            [InstructionsUserInstruction.CommandName] = InstructionsUserInstruction.TryParse,
+            [VerifyUserInstruction.CommandName] = VerifyUserInstruction.TryParse,
+            [ProduceUserInstruction.CommandName] = ProduceUserInstruction.TryParse,
+            [AddTemplateUserInstruction.CommandName] = AddTemplateUserInstruction.TryParse,
+            [ReceiveUserInstruction.CommandName] = ReceiveUserInstruction.TryParse,
+            [GetMovementsUserInstruction.CommandName] = GetMovementsUserInstruction.TryParse,
+        };
 
-    
+
     /// <summary>
     /// Gère l'exécution d'une commande utilisateur
     /// Format attendu => INSTRUCTION ARGS
@@ -63,7 +64,7 @@ public class CommandHandler
             Logger.Log(LogType.ERROR, ex.Message);
         }
     }
-    
+
     public static (string Instruction, string Args) ParseCommand(string commandLine)
     {
         if (string.IsNullOrWhiteSpace(commandLine))
@@ -75,11 +76,9 @@ public class CommandHandler
         {
             return (commandLine.Trim(), string.Empty);
         }
-        else
-        {
-            var instruction = commandLine.Substring(0, firstSpaceIndex).Trim();
-            var args = commandLine.Substring(firstSpaceIndex + 1).Trim();
-            return (instruction, args);
-        }
+
+        var instruction = commandLine.Substring(0, firstSpaceIndex).Trim();
+        var args = commandLine.Substring(firstSpaceIndex + 1).Trim();
+        return (instruction, args);
     }
 }

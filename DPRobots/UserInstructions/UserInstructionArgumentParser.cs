@@ -1,5 +1,7 @@
 using System.Text;
+using System.Text.RegularExpressions;
 using DPRobots.Pieces;
+using DPRobots.RobotFactories;
 using DPRobots.Robots;
 using DPRobots.Stock;
 
@@ -13,9 +15,9 @@ public class UserInstructionArgumentParser
             throw new ArgumentException($"La commande `{commandName}` ne prend pas d'arguments.");
     }
     
-    public static Dictionary<string, int> ParseRobotsWithQuantities(string args)
+    public static Dictionary<RobotBlueprint, int> ParseRobotsWithQuantities(string args)
     {
-        var result = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+        var result = new Dictionary<RobotBlueprint, int>();
         var parts = args.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
         foreach (var part in parts)
@@ -30,11 +32,11 @@ public class UserInstructionArgumentParser
                 throw new ArgumentException($"La quantité '{tokens[0]}' n'est pas un nombre valide.");
 
             var robotName = tokens[1];
-            var invalidRobot = RobotTemplates.Get(robotName) == null;
-            if (invalidRobot)
+            var blueprint = RobotTemplates.Get(robotName);
+            if (blueprint == null)
                 throw new ArgumentException($"Le robot '{robotName}' n'est pas reconnu.");
-            if (!result.TryAdd(robotName, quantity))
-                result[robotName] += quantity;
+            if (!result.TryAdd(blueprint, quantity))
+                result[blueprint] += quantity;
         }
 
         return result;
@@ -137,6 +139,37 @@ public class UserInstructionArgumentParser
             .Select(part => part.Trim())
             .Where(part => !string.IsNullOrEmpty(part))
             .ToList();
+    }
+    
+    public static bool TryExtractFactory(ref string args, out RobotFactory? factory)
+    {
+        factory = null;
+        var pattern = @"IN\s+([^\s]+)$";
+        var match = Regex.Match(args, pattern, RegexOptions.IgnoreCase);
+
+        if (match.Success)
+        {
+            var factoryName = match.Groups[1].Value;
+            args = Regex.Replace(args, pattern, "").Trim();
+            factory = FactoryManager.GetInstance().GetFactory(factoryName);
+            return true;
+        }
+
+        return false;
+    }
+    
+    public static (string args, RobotFactory? factory) SplitArgsAndFactory(string input)
+    {
+        var parts = input.Split("IN ", 2);
+
+        if (parts.Length == 0) return ("", null);
+        if (parts.Length == 1)
+            return (parts[0].Trim(), null);
+
+        var factoryName = parts[1].Trim();
+        var factory = FactoryManager.GetInstance().GetFactory(factoryName);
+
+        return (parts[0].Trim(), factory);
     }
 
     
