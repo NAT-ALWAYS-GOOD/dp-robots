@@ -32,5 +32,6 @@ public record HelpUserInstruction : IUserInstruction
         Console.WriteLine("VERIFY : Vérifie la commande.");
         Console.WriteLine("PRODUCE : Produit les robots.");
         Console.WriteLine("ADD_TEMPLATE : Ajoute un modèle de robot.");
+        Console.WriteLine("GET_MOVEMENTS : Affiche l'historique des mouvements d'éléments stockables.");
     }
 }

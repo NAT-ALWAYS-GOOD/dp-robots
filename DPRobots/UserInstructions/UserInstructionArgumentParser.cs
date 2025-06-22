@@ -131,6 +131,15 @@ public class UserInstructionArgumentParser
         return SplitTopLevel(inner).Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToList();
     }
     
+    public static List<string> ParsePieceNames(string args)
+    {
+        return SplitTopLevel(args)
+            .Select(part => part.Trim())
+            .Where(part => !string.IsNullOrEmpty(part))
+            .ToList();
+    }
+
+    
     private static List<string> SplitTopLevel(string input)
     {
         var result = new List<string>();

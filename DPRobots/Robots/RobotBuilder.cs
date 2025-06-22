@@ -68,7 +68,7 @@ public class RobotBuilder(string name)
         foreach (var instruction in _instructions) Console.WriteLine(instruction);
     }
 
-    public Robot Build(bool? printInstructions = true)
+    public Robot Build(bool? printInstructions = true, string? context = null)
     {
         if (_blueprint is null)
             throw new InvalidOperationException("Template must be provided before building.");
@@ -79,7 +79,7 @@ public class RobotBuilder(string name)
         }
 
         var robot = new Robot(name, blueprint: _blueprint);
-        var robotComponents = StockManager.GetRobotComponents(robot.Blueprint);
+        var robotComponents = StockManager.GetRobotComponents(robot.Blueprint, false, context);
         var core = robotComponents.Core;
         core.InstallSystem(_blueprint.SystemPrototype);
         robot.Core = core;

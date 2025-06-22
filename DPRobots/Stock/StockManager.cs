@@ -7,6 +7,8 @@ public class StockManager
 {
     private static List<StockItem> _stock = new();
 
+    private static readonly List<StockMovement> _movements = new();
+
     private static StockManager? _instance;
 
     public static StockManager GetInstance()
@@ -19,22 +21,26 @@ public class StockManager
 
     public void Initialize(List<StockItem> initialStock)
     {
-        _stock = initialStock;
+        foreach (var item in initialStock)
+        {
+            AddStockItem(item, "Initialization");
+        }
         _instance = this;
     }
 
-    public static T RemovePiece<T>(Piece piece) where T : Piece
+    public static T RemovePiece<T>(Piece piece, string? context = null) where T : Piece
     {
         var stockItem = _stock.Find(item => item.Prototype.Equals(piece));
         if (stockItem == null)
             throw new InvalidOperationException($"No stock item found for piece: {piece}");
 
         stockItem.DecreaseQuantity(1);
+        LogMovement(StockOperation.Remove, piece.ToString(), 1, context);
 
         return (T)stockItem.Prototype.Clone();
     }
-    
-    public void AddStockItem(StockItem item)
+
+    public void AddStockItem(StockItem item, string? context = null)
     {
         var existingItem = _stock.Find(stock => stock.Prototype.Equals(item.Prototype));
         if (existingItem != null)
@@ -45,36 +51,39 @@ public class StockManager
         {
             _stock.Add(item);
         }
+
+        LogMovement(StockOperation.Add, item.Prototype.ToString(), 1, context);
     }
 
-    public static void AddRobot(Robot? robot)
+    public static void AddRobot(Robot? robot, string? context = null)
     {
         if (robot == null) return;
-        
+
         var robotStockItem = _stock.Find(item => item.Prototype.Equals(robot));
         if (robotStockItem != null)
             robotStockItem.IncreaseQuantity(1);
         else
             _stock.Add(new StockItem(robot, 1));
+
+        LogMovement(StockOperation.Add, robot.ToString(), 1, context);
     }
 
-    public static RobotComponents GetRobotComponents(RobotBlueprint blueprint, bool simulate = false)
+    public static RobotComponents GetRobotComponents(RobotBlueprint blueprint, bool simulate = false, string? context = null)
     {
-        var core = simulate ? blueprint.CorePrototype : RemovePiece<Core>(blueprint.CorePrototype);
-        var generator = simulate ? blueprint.GeneratorPrototype : RemovePiece<Generator>(blueprint.GeneratorPrototype);
-        var gripModule =
-            simulate ? blueprint.GripModulePrototype : RemovePiece<GripModule>(blueprint.GripModulePrototype);
-        var moveModule =
-            simulate ? blueprint.MoveModulePrototype : RemovePiece<MoveModule>(blueprint.MoveModulePrototype);
+        switch (simulate)
+        {
+            case true:
+                return new RobotComponents(blueprint.CorePrototype, blueprint.GeneratorPrototype,
+                    blueprint.GripModulePrototype, blueprint.MoveModulePrototype);
+            case false:
+                var core = RemovePiece<Core>(blueprint.CorePrototype, context);
+                var generator = RemovePiece<Generator>(blueprint.GeneratorPrototype, context);
+                var gripModule = RemovePiece<GripModule>(blueprint.GripModulePrototype, context);
+                var moveModule = RemovePiece<MoveModule>(blueprint.MoveModulePrototype, context);
 
-        return new RobotComponents(core, generator, gripModule, moveModule);
+                return new RobotComponents(core, generator, gripModule, moveModule);
+        }
     }
-    //
-    // public Dictionary<string, int> Summarize(Dictionary<Robot, int> robotsRequest)
-    // {
-    //     
-    // }
-
 
     public static Dictionary<Piece, int> CalculateOverallNeededStocks(Dictionary<Robot, int> robotRequests,
         bool printDetails = false)
@@ -124,6 +133,18 @@ public class StockManager
         }
 
         return true;
+    }
+
+    public static void LogMovement(StockOperation operation, string itemName, int quantity, string? context = null)
+    {
+        _movements.Add(new StockMovement(operation, itemName, quantity, context));
+    }
+
+    public static IEnumerable<StockMovement> GetMovements(string? filter = null)
+    {
+        return filter == null
+            ? _movements
+            : _movements.Where(m => m.ItemName.Equals(filter, StringComparison.OrdinalIgnoreCase));
     }
 
     public IReadOnlyList<StockItem> GetStock => _stock;

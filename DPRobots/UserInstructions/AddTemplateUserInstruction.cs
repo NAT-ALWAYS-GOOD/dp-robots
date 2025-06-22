@@ -8,13 +8,16 @@ public record AddTemplateUserInstruction(RobotBlueprint Blueprint) : IUserInstru
 {
     public const string CommandName = "ADD_TEMPLATE";
 
-    public override string ToString() => CommandName;
+    public override string ToString() => $"{CommandName} {GivenArgs}";
+
+    private static string? GivenArgs { get; set; }
     
     public static IUserInstruction? TryParse(string args)
     {
         try
         {
             var blueprint = UserInstructionArgumentParser.ParseRobotBlueprint(args);
+            GivenArgs = args;
             return new AddTemplateUserInstruction(blueprint);
         }
         catch (Exception e)

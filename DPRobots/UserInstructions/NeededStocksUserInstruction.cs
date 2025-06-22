@@ -8,7 +8,9 @@ public record NeededStocksUserInstruction(Dictionary<string, int> RobotsWithQuan
 {
     public const string CommandName = "NEEDED_STOCKS";
 
-    public override string ToString() => CommandName;
+    public override string ToString() => $"{CommandName} {GivenArgs}";
+    
+    private static string? GivenArgs { get; set; }
     
     public static IUserInstruction? TryParse(string args)
     {
@@ -18,6 +20,7 @@ public record NeededStocksUserInstruction(Dictionary<string, int> RobotsWithQuan
         try
         {
             var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(args);
+            GivenArgs = args;
             return new NeededStocksUserInstruction(robotsWithQuantities);
         }
         catch (Exception e)

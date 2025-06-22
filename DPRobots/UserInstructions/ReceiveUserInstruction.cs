@@ -7,7 +7,9 @@ public record ReceiveUserInstruction(List<StockItem> ItemsToAdd) : IUserInstruct
 {
     public const string CommandName = "RECEIVE";
 
-    public override string ToString() => CommandName;
+    public override string ToString() => $"{CommandName} {GivenArgs}";
+    
+    private static string? GivenArgs { get; set; }
 
     public static IUserInstruction? TryParse(string args)
     {
@@ -17,6 +19,7 @@ public record ReceiveUserInstruction(List<StockItem> ItemsToAdd) : IUserInstruct
         try
         {
             var itemsToAdd = UserInstructionArgumentParser.ParseStockItems(args);
+            GivenArgs = args;
             return new ReceiveUserInstruction(itemsToAdd);
         }
         catch (Exception e)

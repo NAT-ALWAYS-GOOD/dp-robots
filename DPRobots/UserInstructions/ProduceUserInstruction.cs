@@ -8,7 +8,9 @@ public record ProduceUserInstruction(Dictionary<string, int> RobotsWithQuantitie
 {
     public const string CommandName = "PRODUCE";
 
-    public override string ToString() => CommandName;
+    public override string ToString() => $"{CommandName} {GivenArgs}";
+
+    private static string? GivenArgs { get; set; }
 
     public static IUserInstruction? TryParse(string args)
     {
@@ -18,6 +20,7 @@ public record ProduceUserInstruction(Dictionary<string, int> RobotsWithQuantitie
         try
         {
             var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(args);
+            GivenArgs = args;
             return new ProduceUserInstruction(robotsWithQuantities);
         }
         catch (Exception e)
@@ -45,8 +48,8 @@ public record ProduceUserInstruction(Dictionary<string, int> RobotsWithQuantitie
                 var robot = new RobotBuilder(robotToBuild.ToString())
                     .UseTemplate()
                     .GenerateInstructions()
-                    .Build();
-                StockManager.AddRobot(robot);
+                    .Build(true, ToString());
+                StockManager.AddRobot(robot, ToString());
             }
         }
         

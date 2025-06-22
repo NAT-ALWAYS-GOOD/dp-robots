@@ -14,7 +14,8 @@ public class CommandHandler
         [VerifyUserInstruction.CommandName] = VerifyUserInstruction.TryParse,
         [ProduceUserInstruction.CommandName] = ProduceUserInstruction.TryParse,
         [AddTemplateUserInstruction.CommandName] = AddTemplateUserInstruction.TryParse,
-        [ReceiveUserInstruction.CommandName] = ReceiveUserInstruction.TryParse
+        [ReceiveUserInstruction.CommandName] = ReceiveUserInstruction.TryParse,
+        [GetMovementsUserInstruction.CommandName] = GetMovementsUserInstruction.TryParse,
     };
 
     
@@ -32,6 +33,7 @@ public class CommandHandler
     /// VERIFY ARGS
     /// PRODUCE ARGS
     /// ADD_TEMPLATE ARGS
+    /// GET_MOVEMENTS ARGS
     /// 
     /// </summary>
     /// <param name="commandLine"></param>
