@@ -1,4 +1,5 @@
 using DPRobots.Pieces;
+using DPRobots.RobotFactories;
 using DPRobots.Robots;
 using DPRobots.UserInstructions;
 using Xunit;
@@ -7,25 +8,26 @@ namespace DPRobots.Tests.UserInstructions;
 
 public class UserUserInstructionArgumentParserTest
 {
+    private readonly RobotFactory _factory = new ("Usine");
     public UserUserInstructionArgumentParserTest()
     {
-        RobotTemplates.GetInstance().InitializeTemplates();
+        _factory.Templates.InitializeTemplates();
     }
     
     [Fact]
     public void Should_Parse_RobotCounts_Correctly()
     {
-        var result = UserInstructionArgumentParser.ParseRobotsWithQuantities("2 XM-1, 1 RD-1");
+        var result = UserInstructionArgumentParser.ParseRobotsWithQuantities("2 XM-1, 1 RD-1", _factory);
 
-        Assert.Equal(2, result["XM-1"]);
-        Assert.Equal(1, result["RD-1"]);
+        Assert.Equal(2, result[_factory.Templates.Get("XM-1")!]);
+        Assert.Equal(1, result[_factory.Templates.Get("RD-1")!]);
     }
 
     [Fact]
     public void Should_Throw_If_Format_Is_Invalid()
     {
         var ex = Assert.Throws<ArgumentException>(() =>
-            UserInstructionArgumentParser.ParseRobotsWithQuantities("XM-1"));
+            UserInstructionArgumentParser.ParseRobotsWithQuantities("XM-1", _factory));
 
         Assert.Contains("Le format de l'argument 'XM-1' est incorrect. Attendu : 'quantité nom_de_robot'.", ex.Message);
     }
@@ -34,7 +36,7 @@ public class UserUserInstructionArgumentParserTest
     public void Should_Throw_If_Quantity_Is_Invalid()
     {
         var ex = Assert.Throws<ArgumentException>(() =>
-            UserInstructionArgumentParser.ParseRobotsWithQuantities("abc XM-1"));
+            UserInstructionArgumentParser.ParseRobotsWithQuantities("abc XM-1", _factory));
 
         Assert.Contains("La quantité 'abc' n'est pas un nombre valide.", ex.Message);
     }
@@ -42,9 +44,9 @@ public class UserUserInstructionArgumentParserTest
     [Fact]
     public void Should_Sum_Quantities_If_Duplicated()
     {
-        var result = UserInstructionArgumentParser.ParseRobotsWithQuantities("1 XM-1, 2 XM-1");
+        var result = UserInstructionArgumentParser.ParseRobotsWithQuantities("1 XM-1, 2 XM-1", _factory);
 
-        Assert.Equal(3, result["XM-1"]);
+        Assert.Equal(3, result[_factory.Templates.Get("XM-1")!]);
     }
     
     [Fact]

@@ -1,6 +1,6 @@
 using DPRobots.Logging;
 using DPRobots.Pieces;
-using DPRobots.Robots;
+using DPRobots.RobotFactories;
 using DPRobots.Stock;
 using Xunit;
 
@@ -8,15 +8,13 @@ namespace DPRobots.Tests;
 
 public class CommandHandlerTest
 {
-    public CommandHandlerTest()
-    {
-        RobotTemplates.GetInstance().InitializeTemplates();
-    }
+    private static RobotFactory _factory = new ("Usine");
 
     private static readonly CommandHandler CommandHandler;
 
     static CommandHandlerTest()
     {
+        _factory.Templates.InitializeTemplates();
         List<StockItem> stock =
         [
             new(new Core(CoreNames.Cd1, PieceCategory.Domestic), 5),
@@ -27,8 +25,8 @@ public class CommandHandlerTest
             new(new MoveModule(MoveModuleNames.Lm1, PieceCategory.Military), 5)
         ];
         CommandHandler = new CommandHandler();
-        var stockManager = StockManager.GetInstance();
-        stockManager.Initialize(stock);
+        _factory.Stock.Initialize(stock);
+        FactoryManager.GetInstance().RegisterFactory(_factory);
     }
 
     [Fact]
@@ -129,7 +127,7 @@ public class CommandHandlerTest
     {
         var output = new StringWriter();
         Console.SetOut(output);
-        const string command = "VERIFY 2 XM-1, 1 RD-1";
+        const string command = "VERIFY 2 XM-1, 1 RD-1 IN Usine";
 
         CommandHandler.HandleCommand(command);
 
@@ -143,14 +141,14 @@ public class CommandHandlerTest
         var output = new StringWriter();
         Console.SetOut(output);
 
-        StockManager.GetInstance().Initialize([
+        _factory.Stock.Initialize([
             new StockItem(PieceFactory.Create("Core_CM1"), 10),
             new StockItem(PieceFactory.Create("Generator_GM1"), 10),
             new StockItem(PieceFactory.Create("Arms_AM1"), 10),
             new StockItem(PieceFactory.Create("Legs_LM1"), 10)
         ]);
 
-        const string command = "PRODUCE 1 XM-1";
+        const string command = "PRODUCE 1 XM-1 IN Usine";
 
         CommandHandler.HandleCommand(command);
 
@@ -168,7 +166,7 @@ public class CommandHandlerTest
 
         // verify stock
         Assert.Equal(1,
-            StockManager.GetInstance().GetStock.Where(item => item.Prototype.ToString() == "XM-1")
+            _factory.Stock.GetStock.Where(item => item.Prototype.ToString() == "XM-1")
                 .FirstOrDefault()?.Quantity);
     }
 

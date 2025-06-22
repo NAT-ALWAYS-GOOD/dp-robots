@@ -26,6 +26,11 @@ public class StockManager
             throw new InvalidOperationException($"No stock item found for piece: {piece}");
 
         stockItem.DecreaseQuantity(amount);
+        
+        if (stockItem.Quantity <= 0)
+        {
+            _stock.Remove(stockItem);
+        }
         LogMovement(StockOperation.Remove, piece.ToString(), 1, context);
 
         return (T)stockItem.Prototype.Clone();
@@ -58,6 +63,10 @@ public class StockManager
             _stock.Remove(item);
         }
 
+        if (item.Quantity <= 0)
+        {
+            _stock.Remove(item);
+        }
         LogMovement(StockOperation.Remove, item.Prototype.ToString(), item.Quantity, context);
     }
 

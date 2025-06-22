@@ -1,6 +1,5 @@
 using DPRobots.Instructions;
 using DPRobots.Logging;
-using DPRobots.Pieces;
 using DPRobots.RobotFactories;
 
 namespace DPRobots.Robots;
@@ -17,7 +16,8 @@ public class RobotBuilder(string name, RobotFactory factory)
             return this;
         }
         _blueprint = factory.Templates.Get(name);
-        if (_blueprint is null) Logger.Log(LogType.ERROR, $"`{name}` is not a recognized robot");
+        if (_blueprint is null)
+            throw new InvalidOperationException($"`{name}` is not a recognized robot");
         return this;
     }
 
