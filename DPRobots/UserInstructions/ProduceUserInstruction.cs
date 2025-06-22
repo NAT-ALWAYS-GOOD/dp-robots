@@ -1,7 +1,7 @@
+using DPRobots.Instructions;
 using DPRobots.Logging;
 using DPRobots.RobotFactories;
 using DPRobots.Robots;
-using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
@@ -23,16 +23,16 @@ public record ProduceUserInstruction(Dictionary<RobotBlueprint, int> RobotsWithQ
 
         try
         {
-            var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(robotArgs);
-            var availableFactories =
-                FactoryManager.GetInstance().FindFactoriesWithAvailableStock(robotsWithQuantities);
+            var robotsRequest = UserInstructionArgumentParser.ParseRobotsRequest(robotArgs);
+            var availableFactories = FactoryManager.GetInstance().GetAvailableFactories(robotsRequest);
+
             if (factory is null)
             {
                 Logger.Log(LogType.ERROR,
                     $"Missing target factory. Available factories for this instruction are {string.Join(", ", availableFactories.Select(f => f.Name))}.");
                 return null;
             }
-            
+
             if (!availableFactories.Contains(factory))
             {
                 Logger.Log(LogType.ERROR,
@@ -41,6 +41,7 @@ public record ProduceUserInstruction(Dictionary<RobotBlueprint, int> RobotsWithQ
             }
 
             GivenArgs = args;
+            var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(robotArgs, factory);
             return new ProduceUserInstruction(robotsWithQuantities, factory);
         }
         catch (Exception e)
@@ -58,8 +59,8 @@ public record ProduceUserInstruction(Dictionary<RobotBlueprint, int> RobotsWithQ
             {
                 var robot = new RobotBuilder(robotToBuild.Name, Factory)
                     .UseTemplate()
-                    .GenerateInstructions()
                     .Build(true, ToString());
+                InstructionsGenerator.GetInstance().GenerateInstructions(robotToBuild);
                 Factory.Stock.AddRobot(robot, 1, ToString());
             }
         }

@@ -5,28 +5,18 @@ namespace DPRobots.Robots;
 
 public class RobotTemplates
 {
-    private static readonly Dictionary<string, RobotBlueprint> Templates = new();
-    
-    private static RobotTemplates? _instance;
+    private readonly Dictionary<string, RobotBlueprint> _templates = new();
 
-    public static RobotTemplates GetInstance()
-    {
-        if (_instance != null)
-            return _instance;
-
-        return _instance = new RobotTemplates();
-    }
-
-    public static void Add(RobotBlueprint template)
+    public void Add(RobotBlueprint template)
     {
         if (!RobotBlueprintValidator.IsValid(template))
             Logger.Log(LogType.ERROR, $"Le template {template.Name} n'est pas valide");
-        Templates[template.Name] = template;
+        _templates[template.Name] = template;
     }
 
-    public static RobotBlueprint? Get(string name)
+    public RobotBlueprint? Get(string name)
     {
-        return Templates.GetValueOrDefault(name);
+        return _templates.GetValueOrDefault(name);
     }
 
     public void InitializeTemplates()

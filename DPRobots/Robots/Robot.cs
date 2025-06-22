@@ -1,4 +1,5 @@
 using DPRobots.Pieces;
+using DPRobots.RobotFactories;
 
 namespace DPRobots.Robots;
 
@@ -37,19 +38,29 @@ public class Robot : Piece
     /// Si le nom ne correspond à aucun robot connu, retourne null.
     /// </summary>
     /// <param name="name"></param>
-    public static Robot? FromName(string name)
+    /// <param name="factoryFound"></param>
+    /// 
+    public static Robot? FromName(string name, out RobotFactory? factoryFound)
     {
-        var blueprint = RobotTemplates.Get(name);
-        if (blueprint is null) return null;
+        foreach (var factory in FactoryManager.GetInstance().Factories)
+        {
+            var blueprint = factory.Templates.Get(name);
+            if (blueprint is not null)
+            {
+                factoryFound = factory;
+                var robot = new Robot(name, blueprint);
+                robot.Core = blueprint.CorePrototype;
+                robot.Generator = blueprint.GeneratorPrototype;
+                robot.GripModule = blueprint.GripModulePrototype;
+                robot.MoveModule = blueprint.MoveModulePrototype;
+                return robot;
+            }
+        }
 
-        var robot = new Robot(name, blueprint: blueprint);
-        robot.Core = blueprint.CorePrototype;
-        robot.Generator = blueprint.GeneratorPrototype;
-        robot.GripModule = blueprint.GripModulePrototype;
-        robot.MoveModule = blueprint.MoveModulePrototype;
-
-        return robot;
+        factoryFound = null;
+        return null;
     }
+
 
     public override object Clone()
     {

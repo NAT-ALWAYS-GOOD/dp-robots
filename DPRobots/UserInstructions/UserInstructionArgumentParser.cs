@@ -15,7 +15,32 @@ public class UserInstructionArgumentParser
             throw new ArgumentException($"La commande `{commandName}` ne prend pas d'arguments.");
     }
     
-    public static Dictionary<RobotBlueprint, int> ParseRobotsWithQuantities(string args)
+    public static Dictionary<string, int> ParseRobotsRequest(string args)
+    {
+        var result = new Dictionary<string, int>();
+        var parts = args.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+        foreach (var part in parts)
+        {
+            var trimmed = part.Trim();
+            var tokens = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            if (tokens.Length != 2)
+                throw new ArgumentException(
+                    $"Le format de l'argument '{trimmed}' est incorrect. Attendu : 'quantité nom_de_robot'.");
+
+            if (!int.TryParse(tokens[0], out var quantity))
+                throw new ArgumentException($"La quantité '{tokens[0]}' n'est pas un nombre valide.");
+
+            var robotName = tokens[1];
+
+            if (!result.TryAdd(robotName, quantity))
+                result[robotName] += quantity;
+        }
+
+        return result;
+    }
+    
+    public static Dictionary<RobotBlueprint, int> ParseRobotsWithQuantities(string args, RobotFactory factory)
     {
         var result = new Dictionary<RobotBlueprint, int>();
         var parts = args.Split(',', StringSplitOptions.RemoveEmptyEntries);
@@ -32,9 +57,9 @@ public class UserInstructionArgumentParser
                 throw new ArgumentException($"La quantité '{tokens[0]}' n'est pas un nombre valide.");
 
             var robotName = tokens[1];
-            var blueprint = RobotTemplates.Get(robotName);
+            var blueprint = factory.Templates.Get(robotName);
             if (blueprint == null)
-                throw new ArgumentException($"Le robot '{robotName}' n'est pas reconnu.");
+                throw new ArgumentException($"Le robot '{robotName}' n'est pas connu dans l'usine `{factory.Name}`.");
             if (!result.TryAdd(blueprint, quantity))
                 result[blueprint] += quantity;
         }
@@ -94,7 +119,7 @@ public class UserInstructionArgumentParser
         return new RobotBlueprint(name, core, system, generator, grip, move);
     }
     
-    public static List<StockItem> ParseStockItems(string args)
+    public static List<StockItem> ParseStockItems(string args, RobotFactory factory)
     {
         var result = new List<StockItem>();
         var parts = SplitTopLevel(args);
@@ -114,7 +139,9 @@ public class UserInstructionArgumentParser
                 throw new ArgumentException($"Invalid quantity '{quantityPart}'.");
 
             var piece = PieceFactory.TryCreate(namePart);
-            var robot = Robot.FromName(namePart);
+            var robot = Robot.FromName(namePart, out var factoryFound);
+            if (robot != null && factoryFound != factory)
+                throw new ArgumentException($"Robot '{namePart}' is not available in the specified factory '{factory.Name}'.");
 
             if (piece == null && robot == null)
                 throw new ArgumentException($"No piece or robot found with name '{namePart}'.");

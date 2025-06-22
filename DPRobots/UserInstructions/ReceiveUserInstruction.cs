@@ -21,13 +21,13 @@ public record ReceiveUserInstruction(List<StockItem> ItemsToAdd, RobotFactory Fa
         if (factory is null)
         {
             Logger.Log(LogType.ERROR,
-                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.Factories.Select(f => f.Name))}.");
+                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.GetInstance().Factories.Select(f => f.Name))}.");
             return null;
         }
 
         try
         {
-            var itemsToAdd = UserInstructionArgumentParser.ParseStockItems(stockArgs);
+            var itemsToAdd = UserInstructionArgumentParser.ParseStockItems(stockArgs, factory);
             GivenArgs = args;
             return new ReceiveUserInstruction(itemsToAdd, factory);
         }

@@ -1,6 +1,7 @@
+using DPRobots.Instructions;
 using DPRobots.Logging;
+using DPRobots.RobotFactories;
 using DPRobots.Robots;
-using DPRobots.Stock;
 
 namespace DPRobots.UserInstructions;
 
@@ -19,9 +20,26 @@ public record InstructionsUserInstruction(Dictionary<RobotBlueprint, int> Robots
 
         try
         {
-            var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(args);
+            var robotsRequest = UserInstructionArgumentParser.ParseRobotsRequest(args);
+            var factories = FactoryManager.GetInstance().Factories;
+            var resolved = new Dictionary<RobotBlueprint, int>();
+            foreach (var (robotName, quantity) in robotsRequest)
+            {
+                var blueprint = factories
+                    .Select(f => f.Templates.Get(robotName))
+                    .FirstOrDefault(b => b is not null);
+
+                if (blueprint is null)
+                {
+                    Logger.Log(LogType.ERROR, $"Le robot `{robotName}` n'existe dans aucune usine.");
+                    return null;
+                }
+
+                if (!resolved.TryAdd(blueprint, quantity))
+                    resolved[blueprint] += quantity;
+            }
             GivenArgs = args;
-            return new InstructionsUserInstruction(robotsWithQuantities);
+            return new InstructionsUserInstruction(resolved);
         }
         catch (Exception e)
         {
@@ -36,10 +54,7 @@ public record InstructionsUserInstruction(Dictionary<RobotBlueprint, int> Robots
         {
             for (var i = 0; i < count; i++)
             {
-                new RobotBuilder(blueprint.Name)
-                    .UseTemplate()
-                    .GenerateInstructions()
-                    .Simulate();
+                InstructionsGenerator.GetInstance().PrintInstructions(blueprint);
             }
         }
     }

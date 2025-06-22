@@ -23,13 +23,13 @@ public record VerifyUserInstruction(Dictionary<RobotBlueprint, int> RobotsWithQu
         if (factory is null)
         {
             Logger.Log(LogType.ERROR,
-                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.Factories.Select(f => f.Name))}.");
+                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.GetInstance().Factories.Select(f => f.Name))}.");
             return null;
         }
 
         try
         {
-            var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(robotArgs);
+            var robotsWithQuantities = UserInstructionArgumentParser.ParseRobotsWithQuantities(robotArgs, factory);
             GivenArgs = args;
             return new VerifyUserInstruction(robotsWithQuantities, factory);
         }

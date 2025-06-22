@@ -1,5 +1,4 @@
 using DPRobots.Logging;
-using DPRobots.Pieces;
 using DPRobots.RobotFactories;
 using DPRobots.Robots;
 
@@ -22,13 +21,13 @@ public record AddTemplateUserInstruction(RobotBlueprint Blueprint, RobotFactory 
         if (factory is null)
         {
             Logger.Log(LogType.ERROR,
-                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.Factories.Select(f => f.Name))}.");
+                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.GetInstance().Factories.Select(f => f.Name))}.");
             return null;
         }
         
         try
         {
-            var blueprint = UserInstructionArgumentParser.ParseRobotBlueprint(args);
+            var blueprint = UserInstructionArgumentParser.ParseRobotBlueprint(blueprintArgs);
             GivenArgs = args;
             return new AddTemplateUserInstruction(blueprint, factory);
         }
@@ -48,6 +47,6 @@ public record AddTemplateUserInstruction(RobotBlueprint Blueprint, RobotFactory 
             return;
         }
 
-        RobotTemplates.Add(Blueprint);
+        Factory.Templates.Add(Blueprint);
     }
 }

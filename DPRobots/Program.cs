@@ -1,5 +1,4 @@
 ﻿using DPRobots.Logging;
-using DPRobots.Robots;
 using DPRobots.Stock;
 using DPRobots.Pieces;
 using DPRobots.RobotFactories;
@@ -10,9 +9,6 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        var robotTemplates = RobotTemplates.GetInstance();
-        robotTemplates.InitializeTemplates();
-        
         List<StockItem> stock =
         [
             new(new Core(CoreNames.Cd1, PieceCategory.Domestic), 5),
@@ -30,8 +26,12 @@ public class Program
         ];
         
         var factoryManager = FactoryManager.GetInstance();
-        factoryManager.RegisterFactory(new RobotFactory("Usine1", stock));
-        factoryManager.RegisterFactory(new RobotFactory("Usine2"));
+        var factory1 = new RobotFactory("Usine1", stock);
+        factory1.Templates.InitializeTemplates();
+        factoryManager.RegisterFactory(factory1);
+        var factory2 = new RobotFactory("Usine2");
+        factory2.Templates.InitializeTemplates();
+        factoryManager.RegisterFactory(factory2);
 
         Console.WriteLine("Tapez votre commande ou 'EXIT' pour quitter.");
 

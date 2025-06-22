@@ -18,7 +18,7 @@ public record GetMovementsUserInstruction(RobotFactory Factory, List<string>? Pi
         if (factory is null)
         {
             Logger.Log(LogType.ERROR,
-                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.Factories.Select(f => f.Name))}.");
+                $"Missing target factory. Available factory for this instruction are {string.Join(", ", FactoryManager.GetInstance().Factories.Select(f => f.Name))}.");
             return null;
         }
         

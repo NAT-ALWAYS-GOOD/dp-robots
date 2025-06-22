@@ -24,7 +24,7 @@ public record TransferUserInstruction(
 
             var source = FactoryManager.GetInstance().GetFactory(parts[0]);
             var target = FactoryManager.GetInstance().GetFactory(parts[1]);
-            var pieces = UserInstructionArgumentParser.ParseStockItems(parts[2]);
+            var pieces = UserInstructionArgumentParser.ParseStockItems(parts[2], target);
 
             GivenArgs = args;
             return new TransferUserInstruction(source, target, pieces);
