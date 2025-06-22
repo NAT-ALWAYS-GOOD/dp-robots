@@ -60,7 +60,7 @@ public record ProduceUserInstruction(Dictionary<RobotBlueprint, int> RobotsWithQ
                     .UseTemplate()
                     .GenerateInstructions()
                     .Build(true, ToString());
-                Factory.Stock.AddRobot(robot, ToString());
+                Factory.Stock.AddRobot(robot, 1, ToString());
             }
         }
 

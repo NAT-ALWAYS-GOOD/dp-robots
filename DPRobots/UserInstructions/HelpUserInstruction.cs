@@ -33,5 +33,6 @@ public record HelpUserInstruction : IUserInstruction
         Console.WriteLine("PRODUCE : Produit les robots.");
         Console.WriteLine("ADD_TEMPLATE : Ajoute un modèle de robot.");
         Console.WriteLine("GET_MOVEMENTS : Affiche l'historique des mouvements d'éléments stockables.");
+        Console.WriteLine("TRANSFER : Transfère des pièces entre usines.");
     }
 }

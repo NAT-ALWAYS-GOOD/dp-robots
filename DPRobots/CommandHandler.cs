@@ -17,6 +17,7 @@ public class CommandHandler
             [AddTemplateUserInstruction.CommandName] = AddTemplateUserInstruction.TryParse,
             [ReceiveUserInstruction.CommandName] = ReceiveUserInstruction.TryParse,
             [GetMovementsUserInstruction.CommandName] = GetMovementsUserInstruction.TryParse,
+            [TransferUserInstruction.CommandName] = TransferUserInstruction.TryParse,
         };
 
 

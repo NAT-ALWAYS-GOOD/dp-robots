@@ -16,14 +16,16 @@ public class StockManager
             AddStockItem(item, "Initialization");
         }
     }
+    
+    public bool Has(StockItem item) => _stock.Any(stockItem => stockItem.Prototype.Equals(item.Prototype) && stockItem.Quantity >= item.Quantity);
 
-    public T RemovePiece<T>(Piece piece, string? context = null) where T : Piece
+    public T RemovePiece<T>(Piece piece, int amount = 1, string? context = null) where T : Piece
     {
         var stockItem = _stock.Find(item => item.Prototype.Equals(piece));
         if (stockItem == null)
             throw new InvalidOperationException($"No stock item found for piece: {piece}");
 
-        stockItem.DecreaseQuantity(1);
+        stockItem.DecreaseQuantity(amount);
         LogMovement(StockOperation.Remove, piece.ToString(), 1, context);
 
         return (T)stockItem.Prototype.Clone();
@@ -41,20 +43,35 @@ public class StockManager
             _stock.Add(item);
         }
 
-        LogMovement(StockOperation.Add, item.Prototype.ToString(), 1, context);
+        LogMovement(StockOperation.Add, item.Prototype.ToString(), item.Quantity, context);
     }
 
-    public void AddRobot(Robot? robot, string? context = null)
+    public void RemoveStockItem(StockItem item, string? context = null)
+    {
+        var existingItem = _stock.Find(stock => stock.Prototype.Equals(item.Prototype));
+        if (existingItem != null)
+        {
+            existingItem.DecreaseQuantity(item.Quantity);
+        }
+        else
+        {
+            _stock.Remove(item);
+        }
+
+        LogMovement(StockOperation.Remove, item.Prototype.ToString(), item.Quantity, context);
+    }
+
+    public void AddRobot(Robot? robot, int amount = 1, string? context = null)
     {
         if (robot == null) return;
 
         var robotStockItem = _stock.Find(item => item.Prototype.Equals(robot));
         if (robotStockItem != null)
-            robotStockItem.IncreaseQuantity(1);
+            robotStockItem.IncreaseQuantity(amount);
         else
-            _stock.Add(new StockItem(robot, 1));
+            _stock.Add(new StockItem(robot, amount));
 
-        LogMovement(StockOperation.Add, robot.ToString(), 1, context);
+        LogMovement(StockOperation.Add, robot.ToString(), amount, context);
     }
 
     public RobotComponents GetRobotComponents(RobotBlueprint blueprint, bool simulate = false, string? context = null)
@@ -65,10 +82,10 @@ public class StockManager
                 return new RobotComponents(blueprint.CorePrototype, blueprint.GeneratorPrototype,
                     blueprint.GripModulePrototype, blueprint.MoveModulePrototype);
             case false:
-                var core = RemovePiece<Core>(blueprint.CorePrototype, context);
-                var generator = RemovePiece<Generator>(blueprint.GeneratorPrototype, context);
-                var gripModule = RemovePiece<GripModule>(blueprint.GripModulePrototype, context);
-                var moveModule = RemovePiece<MoveModule>(blueprint.MoveModulePrototype, context);
+                var core = RemovePiece<Core>(blueprint.CorePrototype, 1, context);
+                var generator = RemovePiece<Generator>(blueprint.GeneratorPrototype, 1, context);
+                var gripModule = RemovePiece<GripModule>(blueprint.GripModulePrototype, 1, context);
+                var moveModule = RemovePiece<MoveModule>(blueprint.MoveModulePrototype, 1, context);
 
                 return new RobotComponents(core, generator, gripModule, moveModule);
         }
