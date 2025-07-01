@@ -1,5 +1,5 @@
 using DPRobots.Instructions;
-using DPRobots.Logging;
+using DPRobots.Pieces;
 using DPRobots.RobotFactories;
 
 namespace DPRobots.Robots;
@@ -42,6 +42,17 @@ public class RobotBuilder(string name, RobotFactory factory)
         robot.GripModule = robotComponents.GripModule;
         robot.MoveModule = robotComponents.MoveModule;
 
+        if (_blueprint.AdditionalModules is not null && _blueprint.AdditionalModules.Count > 0)
+        {
+            robot.AdditionalModules = new List<Piece>();
+
+            foreach (var module in _blueprint.AdditionalModules)
+            {
+                var piece = factory.Stock.RemovePiece<Piece>(module, 1, context);
+                robot.AdditionalModules.Add(piece);
+            }
+        }
+        
         return robot;
     }
 }

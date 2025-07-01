@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.RegularExpressions;
 using DPRobots.Pieces;
 using DPRobots.RobotFactories;
 using DPRobots.Robots;
@@ -14,7 +13,7 @@ public class UserInstructionArgumentParser
         if (!string.IsNullOrWhiteSpace(args))
             throw new ArgumentException($"La commande `{commandName}` ne prend pas d'arguments.");
     }
-    
+
     public static Dictionary<string, int> ParseRobotsRequest(string args)
     {
         var result = new Dictionary<string, int>();
@@ -39,7 +38,7 @@ public class UserInstructionArgumentParser
 
         return result;
     }
-    
+
     public static Dictionary<RobotBlueprint, int> ParseRobotsWithQuantities(string args, RobotFactory factory)
     {
         var result = new Dictionary<RobotBlueprint, int>();
@@ -84,6 +83,7 @@ public class UserInstructionArgumentParser
         Generator? generator = null;
         GripModule? grip = null;
         MoveModule? move = null;
+        var additionalModules = new List<Piece>();
 
         foreach (var pieceStr in pieceNames)
         {
@@ -106,8 +106,12 @@ public class UserInstructionArgumentParser
                 case MoveModule mm when move is null:
                     move = mm;
                     break;
+                case GripModule:
+                case MoveModule:
+                    additionalModules.Add(piece);
+                    break;
                 default:
-                    throw new ArgumentException($"Pièce invalide ou dupliquée : `{pieceStr}`");
+                    throw new ArgumentException($"Pièce invalide ou non autorisée comme module complémentaire : `{pieceStr}`");
             }
         }
 
@@ -116,9 +120,9 @@ public class UserInstructionArgumentParser
             throw new ArgumentException("Il manque une ou plusieurs pièces requises.");
         }
 
-        return new RobotBlueprint(name, core, system, generator, grip, move);
+        return new RobotBlueprint(name, core, system, generator, grip, move, additionalModules);
     }
-    
+
     public static List<StockItem> ParseStockItems(string args, RobotFactory factory)
     {
         var result = new List<StockItem>();
@@ -141,7 +145,8 @@ public class UserInstructionArgumentParser
             var piece = PieceFactory.TryCreate(namePart);
             var robot = Robot.FromName(namePart, out var factoryFound);
             if (robot != null && factoryFound != factory)
-                throw new ArgumentException($"Robot '{namePart}' is not available in the specified factory '{factory.Name}'.");
+                throw new ArgumentException(
+                    $"Robot '{namePart}' is not available in the specified factory '{factory.Name}'.");
 
             if (piece == null && robot == null)
                 throw new ArgumentException($"No piece or robot found with name '{namePart}'.");
@@ -159,7 +164,7 @@ public class UserInstructionArgumentParser
         var inner = name.Substring(1, name.Length - 2);
         return SplitTopLevel(inner).Select(s => s.Trim()).Where(s => !string.IsNullOrEmpty(s)).ToList();
     }
-    
+
     public static List<string> ParsePieceNames(string args)
     {
         return SplitTopLevel(args)
@@ -167,24 +172,7 @@ public class UserInstructionArgumentParser
             .Where(part => !string.IsNullOrEmpty(part))
             .ToList();
     }
-    
-    public static bool TryExtractFactory(ref string args, out RobotFactory? factory)
-    {
-        factory = null;
-        var pattern = @"IN\s+([^\s]+)$";
-        var match = Regex.Match(args, pattern, RegexOptions.IgnoreCase);
 
-        if (match.Success)
-        {
-            var factoryName = match.Groups[1].Value;
-            args = Regex.Replace(args, pattern, "").Trim();
-            factory = FactoryManager.GetInstance().GetFactory(factoryName);
-            return true;
-        }
-
-        return false;
-    }
-    
     public static (string args, RobotFactory? factory) SplitArgsAndFactory(string input)
     {
         var parts = input.Split("IN ", 2);
@@ -199,7 +187,7 @@ public class UserInstructionArgumentParser
         return (parts[0].Trim(), factory);
     }
 
-    
+
     private static List<string> SplitTopLevel(string input)
     {
         var result = new List<string>();
@@ -227,7 +215,7 @@ public class UserInstructionArgumentParser
 
         return result;
     }
-    
+
     private static int IndexOfTopLevelSpace(string input)
     {
         int depth = 0;
@@ -239,6 +227,7 @@ public class UserInstructionArgumentParser
             else if (c == ' ' && depth == 0)
                 return i;
         }
+
         return -1;
     }
 }

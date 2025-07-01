@@ -11,6 +11,7 @@ public class Robot : Piece
     public Generator? Generator { get; internal set; }
     public GripModule? GripModule { get; internal set; }
     public MoveModule? MoveModule { get; internal set; }
+    public List<Piece>? AdditionalModules { get; internal set; }
     
     public Robot(string name, RobotBlueprint? blueprint)
         : base(name, blueprint?.InferredCategory)
@@ -31,6 +32,7 @@ public class Robot : Piece
         Generator = blueprint.GeneratorPrototype;
         GripModule = blueprint.GripModulePrototype;
         MoveModule = blueprint.MoveModulePrototype;
+        AdditionalModules = blueprint.AdditionalModules;
     }
 
     /// <summary>
@@ -53,6 +55,7 @@ public class Robot : Piece
                 robot.Generator = blueprint.GeneratorPrototype;
                 robot.GripModule = blueprint.GripModulePrototype;
                 robot.MoveModule = blueprint.MoveModulePrototype;
+                robot.AdditionalModules = blueprint.AdditionalModules;
                 return robot;
             }
         }
@@ -69,7 +72,11 @@ public class Robot : Piece
             Core = Core?.Clone() as Core,
             Generator = Generator?.Clone() as Generator,
             GripModule = GripModule?.Clone() as GripModule,
-            MoveModule = MoveModule?.Clone() as MoveModule
+            MoveModule = MoveModule?.Clone() as MoveModule,
+            AdditionalModules = AdditionalModules?
+                .Select(m => m.Clone() as Piece)
+                .OfType<Piece>()
+                .ToList()
         };
         return clonedRobot;
     }

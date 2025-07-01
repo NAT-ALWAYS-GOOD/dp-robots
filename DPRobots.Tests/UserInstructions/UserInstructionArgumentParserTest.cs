@@ -1,6 +1,5 @@
 using DPRobots.Pieces;
 using DPRobots.RobotFactories;
-using DPRobots.Robots;
 using DPRobots.UserInstructions;
 using Xunit;
 
@@ -82,9 +81,20 @@ public class UserUserInstructionArgumentParserTest
         var ex = Assert.Throws<ArgumentException>(() =>
             UserInstructionArgumentParser.ParseRobotBlueprint(args));
 
-        Assert.Contains("dupliquée", ex.Message);
+        Assert.Contains("invalide", ex.Message);
     }
 
+    [Fact]
+    public void Should_Allow_Additional_Modules()
+    {
+        var args = "MYBOT, Core_CM1, System_SB1, Generator_GM1, Arms_AM1, Legs_LM1, Arms_AM1";
+
+        var blueprint = UserInstructionArgumentParser.ParseRobotBlueprint(args);
+
+        Assert.Equal("MYBOT", blueprint.Name);
+        Assert.Contains(blueprint.AdditionalModules ?? [], m => m.ToString() == "Arms_AM1");
+    }
+    
     [Fact]
     public void Should_Throw_If_Piece_Type_Is_Unrecognized()
     {

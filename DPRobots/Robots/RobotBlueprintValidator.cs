@@ -27,18 +27,23 @@ public static class RobotBlueprintValidator
         [PieceCategory.Military] = 2,
         [PieceCategory.General] = 0
     };
-    
-    public static bool AreAdditionalModulesValid(RobotBlueprint blueprint)
+
+    private static bool AreAdditionalModulesValid(RobotBlueprint blueprint)
     {
         var category = blueprint.InferredCategory;
         if (category == null)
         {
             return false;
         }
+        
+        var additionalModules = blueprint.AdditionalModules ?? [];
+        bool allValidTypes = additionalModules.All(module => module is GripModule || module is MoveModule);
+        if (!allValidTypes)
+            return false;
 
-        var additionalModulesCount = blueprint.AdditionalModules?.Count ?? 0;
-
-        return additionalModulesCount <= MaxAdditionalModules[category.Value];
+        var additionalModulesCount = additionalModules.Count;
+        var maxAllowed = MaxAdditionalModules[category.Value];
+        return additionalModulesCount <= maxAllowed;
     }
 
     public static bool IsValid(RobotBlueprint blueprint)
